@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './UIOverlay.css';
 
 export function UIOverlay() {
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
 
@@ -15,8 +17,32 @@ export function UIOverlay() {
       setShowInstructions(false);
     }, 8000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Close on any keystroke or click
+    const handleDismiss = () => {
+      if (showInstructions) {
+        setShowInstructions(false);
+      }
+    };
+
+    if (showInstructions) {
+      // Delay adding event listeners to prevent immediate dismissal when reopening
+      const listenerTimer = setTimeout(() => {
+        window.addEventListener('keydown', handleDismiss);
+        window.addEventListener('click', handleDismiss);
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(listenerTimer);
+        window.removeEventListener('keydown', handleDismiss);
+        window.removeEventListener('click', handleDismiss);
+      };
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showInstructions]);
 
   return (
     <div className="ui-overlay">
@@ -30,33 +56,30 @@ export function UIOverlay() {
       {showInstructions && (
         <div className="instructions" onClick={() => setShowInstructions(false)}>
           <div className="instructions-content">
-            <h2>Controls</h2>
+            <h2>{t('navigation.controls')}</h2>
             {isMobile ? (
               <p>
-                Tilt your device to navigate the space shuttle.
+                {t('navigation.tiltDevice')}
                 <br />
-                Explore the projects floating in space!
+                {t('navigation.controls')}!
               </p>
             ) : (
               <p>
-                Use <strong>Arrow Keys</strong> to navigate the space shuttle.
+                {t('navigation.arrowKeys')}
                 <br />
-                <strong>↑ ↓</strong> - Move Forward/Backward
+                <strong>↑ ↓</strong> - Forward/Backward
                 <br />
-                <strong>← →</strong> - Rotate Left/Right
-                <br />
-                <br />
-                Explore the projects floating in space!
+                <strong>← →</strong> - Left/Right
               </p>
             )}
-            <small>Click anywhere to dismiss</small>
+            <small>Click to dismiss</small>
           </div>
         </div>
       )}
 
       {/* Footer */}
       <footer className="footer">
-        <p>Navigate through space to explore my portfolio</p>
+        <p>{t('navigation.explorePortfolio')}</p>
       </footer>
 
       {/* Toggle instructions button */}

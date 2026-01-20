@@ -1,0 +1,52 @@
+{
+  "navigation": {
+    "controls": "Steuerung",
+    "arrowKeys": "Pfeiltasten",
+    "tiltDevice": "Gerät neigen",
+    "explorePortfolio": "Navigiere durch den Weltraum, um mein Portfolio zu erkunden"
+  },
+  "footer": {
+    "madeWith": "Erstellt mit",
+    "and": "und"
+  },
+  "popup": {
+    "close": "Drücke <strong>ESC</strong> oder klicke irgendwo zum Schließen",
+    "visitProfile": "Profil besuchen"
+  },
+  "projects": {
+    "bioexotec": {
+      "title": "🧬 BIOEXOTEC",
+      "description": "ML Engineer • Genexpressionsanalyse zur Früherkennung von Krebs • +5% Spezifitätsverbesserung • Migration vom PoC zur skalierbaren GCP-Anwendung • Tech: Scikit-Learn, MLFlow, Google Cloud Platform"
+    },
+    "ghz": {
+      "title": "💡 GHZ Solutions",
+      "description": "Data Engineer • Entwicklung eines RAG-Tools → +30% Mitarbeitereffizienz • Containerisierte Datenverarbeitungs-Pipelines • Tech: Python (Langchain, Polars, FastAPI), Docker, React"
+    },
+    "uniklinik": {
+      "title": "🏥 Universitätsklinikum Ulm",
+      "description": "Data Engineer • Automatisierte Qualitätssicherungstools für Datenverarbeitung (Pydantic) • Projektleitung: bundesweites Klinik-Datennetzwerk (datenschutzorientiert) • Studiendatenanalyse mit Präsentationen • Tech: Python, R, SQL"
+    },
+    "uni": {
+      "title": "🔬 Universität Ulm",
+      "description": "Research Assistant • Medizininformatik-Forschung: Smartphone-/Wearable-Gesundheitsdaten • Veröffentlichungen in wissenschaftlichen Zeitschriften • Betreuung von Bachelor-/Masterarbeiten • Tech: Flutter, PySpark, MongoDB, FastAPI"
+    },
+    "zeiss": {
+      "title": "🏭 Carl Zeiss MES",
+      "description": "Frontend Developer • Angular-Anwendungen für industrielle Messtechnik • Echtzeit-Features (WebSockets) für MES-Plattform • Tech: Angular, Next.js, Docker, Azure, JIRA"
+    },
+    "liebherr": {
+      "title": "🔧 Liebherr Hausgeräte",
+      "description": "Software Engineer • Vue.js/.NET-Anwendungen mit Datenverarbeitung • Implementierung von CI/CD-Pipelines • Erweiterung des Kubernetes-Clusters • Tech: Vue.js, .NET, MS SQL, Kubernetes, Azure"
+    }
+  },
+  "social": {
+    "linkedin": {
+      "title": "LinkedIn-Profil",
+      "description": "Besuche mein LinkedIn-Profil, um dich zu vernetzen und mehr über meine Arbeit zu erfahren!"
+    },
+    "github": {
+      "title": "GitHub-Profil",
+      "description": "Besuche mein GitHub-Profil, um dich zu vernetzen und mehr über meine Arbeit zu erfahren!"
+    }
+  }
+}

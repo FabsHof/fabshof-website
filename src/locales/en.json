@@ -1,0 +1,52 @@
+{
+  "navigation": {
+    "controls": "Controls",
+    "arrowKeys": "Arrow Keys",
+    "tiltDevice": "Tilt Device",
+    "explorePortfolio": "Navigate through space to explore my portfolio"
+  },
+  "footer": {
+    "madeWith": "Made with",
+    "and": "and"
+  },
+  "popup": {
+    "close": "Press <strong>ESC</strong> or click anywhere to close",
+    "visitProfile": "Visit Profile"
+  },
+  "projects": {
+    "bioexotec": {
+      "title": "🧬 BIOEXOTEC",
+      "description": "ML Engineer • Gene expression analysis for early cancer detection • +5% specificity improvement • Migrated PoC to scalable GCP application • Tech: Scikit-Learn, MLFlow, Google Cloud Platform"
+    },
+    "ghz": {
+      "title": "💡 GHZ Solutions",
+      "description": "Data Engineer • Developed RAG tool → +30% employee efficiency • Containerized data processing pipelines • Tech: Python (Langchain, Polars, FastAPI), Docker, React"
+    },
+    "uniklinik": {
+      "title": "🏥 Universitätsklinikum Ulm",
+      "description": "Data Engineer • Automated quality assurance tools for data processing (Pydantic) • Project lead: nationwide clinic data network (privacy-focused) • Study data analysis with presentations • Tech: Python, R, SQL"
+    },
+    "uni": {
+      "title": "🔬 Universität Ulm",
+      "description": "Research Assistant • Medical informatics research: smartphone/wearable health data • Publications in scientific journals • Supervised bachelor/master theses • Tech: Flutter, PySpark, MongoDB, FastAPI"
+    },
+    "zeiss": {
+      "title": "🏭 Carl Zeiss MES",
+      "description": "Frontend Developer • Angular applications for industrial measurement technology • Real-time features (WebSockets) for MES platform • Tech: Angular, Next.js, Docker, Azure, JIRA"
+    },
+    "liebherr": {
+      "title": "🔧 Liebherr Hausgeräte",
+      "description": "Software Engineer • Vue.js/.NET applications with data processing • Implemented CI/CD pipelines • Extended Kubernetes cluster • Tech: Vue.js, .NET, MS SQL, Kubernetes, Azure"
+    }
+  },
+  "social": {
+    "linkedin": {
+      "title": "LinkedIn Profile",
+      "description": "Visit my LinkedIn profile to connect and see more of my work!"
+    },
+    "github": {
+      "title": "GitHub Profile",
+      "description": "Visit my GitHub profile to connect and see more of my work!"
+    }
+  }
+}

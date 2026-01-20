@@ -109,56 +109,62 @@ export function SocialMediaObject({ position, type, url, shuttlePosition }: Soci
             </Text>
           </>
         ) : (
-          // GitHub logo - Octocat in circle
+          // GitHub logo - flat rectangular dark icon
           <>
-            {/* Main circle background - dark/white circle */}
+            {/* Background rounded square - dark theme */}
             <mesh castShadow>
-              <cylinderGeometry args={[0.8, 0.8, 0.15, 32]} />
+              <boxGeometry args={[1.4, 1.4, 0.15]} />
               <meshStandardMaterial
-                color="#FFFFFF"
+                color="#24292e"
                 metalness={0.3}
                 roughness={0.7}
-                emissive="#FFFFFF"
-                emissiveIntensity={totalEmissive * 0.3}
+                emissive="#24292e"
+                emissiveIntensity={totalEmissive}
               />
             </mesh>
 
-            {/* GitHub Octocat silhouette */}
+            {/* GitHub cat logo - simplified white mark */}
             <group position={[0, 0, 0.12]}>
-              {/* Main head circle */}
-              <mesh position={[0, 0.1, 0]}>
-                <sphereGeometry args={[0.28, 32, 32]} />
-                <meshStandardMaterial color="#24292e" />
+              {/* Main circle for head */}
+              <mesh position={[0, 0.15, 0]}>
+                <sphereGeometry args={[0.32, 32, 32]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
 
-              {/* Left ear */}
-              <mesh position={[-0.18, 0.32, 0]} rotation={[0, 0, -0.3]}>
-                <boxGeometry args={[0.12, 0.12, 0.05]} />
-                <meshStandardMaterial color="#24292e" />
+              {/* Cat ears */}
+              <mesh position={[-0.2, 0.42, 0]}>
+                <sphereGeometry args={[0.08, 16, 16]} />
+                <meshStandardMaterial color="#FFFFFF" />
+              </mesh>
+              <mesh position={[0.2, 0.42, 0]}>
+                <sphereGeometry args={[0.08, 16, 16]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
 
-              {/* Right ear */}
-              <mesh position={[0.18, 0.32, 0]} rotation={[0, 0, 0.3]}>
-                <boxGeometry args={[0.12, 0.12, 0.05]} />
-                <meshStandardMaterial color="#24292e" />
+              {/* Body - rounded rectangle */}
+              <mesh position={[0, -0.2, 0]}>
+                <boxGeometry args={[0.5, 0.3, 0.05]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
 
-              {/* Body/shoulders */}
-              <mesh position={[0, -0.15, 0]}>
-                <boxGeometry args={[0.5, 0.2, 0.05]} />
-                <meshStandardMaterial color="#24292e" />
+              {/* Arms */}
+              <mesh position={[-0.3, -0.15, 0]} rotation={[0, 0, 0.5]}>
+                <boxGeometry args={[0.12, 0.08, 0.05]} />
+                <meshStandardMaterial color="#FFFFFF" />
+              </mesh>
+              <mesh position={[0.3, -0.15, 0]} rotation={[0, 0, -0.5]}>
+                <boxGeometry args={[0.12, 0.08, 0.05]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
 
-              {/* Left arm */}
-              <mesh position={[-0.32, -0.1, 0]} rotation={[0, 0, 0.4]}>
-                <boxGeometry args={[0.15, 0.08, 0.05]} />
-                <meshStandardMaterial color="#24292e" />
+              {/* Legs */}
+              <mesh position={[-0.12, -0.42, 0]}>
+                <boxGeometry args={[0.1, 0.12, 0.05]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
-
-              {/* Right arm */}
-              <mesh position={[0.32, -0.1, 0]} rotation={[0, 0, -0.4]}>
-                <boxGeometry args={[0.15, 0.08, 0.05]} />
-                <meshStandardMaterial color="#24292e" />
+              <mesh position={[0.12, -0.42, 0]}>
+                <boxGeometry args={[0.1, 0.12, 0.05]} />
+                <meshStandardMaterial color="#FFFFFF" />
               </mesh>
             </group>
           </>

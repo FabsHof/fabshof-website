@@ -1,5 +1,6 @@
 import { Scene } from './components/Scene';
 import { UIOverlay } from './components/UIOverlay';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 import './App.css';
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
     <>
       <Scene />
       <UIOverlay />
+      <LanguageSwitcher />
     </>
   );
 }

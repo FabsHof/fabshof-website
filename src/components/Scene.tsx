@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { useState, useEffect, Suspense } from 'react';
-import { SpaceShuttle } from './SpaceShuttle';
+import { useTranslation } from 'react-i18next';
+import { FlyingSaucer } from './FlyingSaucer';
 import { SpaceEnvironment } from './SpaceEnvironment';
 import { ProjectObject } from './ProjectObject';
 import { SocialMediaObject } from './SocialMediaObject';
@@ -10,16 +11,16 @@ import { useShuttleControls } from '../hooks/useShuttleControls';
 
 interface Project {
   position: [number, number, number];
-  title: string;
+  titleKey: string;  // Translation key instead of translated title
   color: string;
-  description?: string;
+  descriptionKey: string;  // Translation key instead of translated description
 }
 
 interface SocialMedia {
   position: [number, number, number];
   type: 'linkedin' | 'github';
   url: string;
-  title: string;
+  titleKey: string;  // Translation key instead of translated title
   color: string;
 }
 
@@ -30,61 +31,65 @@ interface SceneContentProps {
 
 function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneContentProps) {
   const { position, rotation } = useShuttleControls();
+  const { t } = useTranslation();
 
-  // Real project positions based on work history
+  // Convert rotation number to rotation tuple for Three.js
+  const rotationTuple: [number, number, number] = [0, rotation, 0];
+
+  // Real project positions based on work history - using translation keys
   const projects: Project[] = [
     {
       position: [0, 1, -20],
-      title: '🧬 BIOEXOTEC',
+      titleKey: 'projects.bioexotec.title',
       color: '#9b59b6',
-      description: 'ML Engineer (Dec 2024 - Present) • Gene expression analysis for early cancer detection • +5% specificity improvement • Migrated PoC to scalable GCP application • Tech: Scikit-Learn, MLFlow, Google Cloud Platform'
+      descriptionKey: 'projects.bioexotec.description'
     },
     {
       position: [10, 1, 10],
-      title: '💡 GHZ Solutions',
+      titleKey: 'projects.ghz.title',
       color: '#4a90e2',
-      description: 'Data Engineer (Sept 2022 - March 2025) • Developed RAG tool → +30% employee efficiency • Containerized data processing pipelines • Tech: Python (Langchain, Polars, FastAPI), Docker, React'
+      descriptionKey: 'projects.ghz.description'
     },
     {
       position: [-10, 1, 10],
-      title: '🏥 Universitätsklinikum Ulm',
+      titleKey: 'projects.uniklinik.title',
       color: '#e74c3c',
-      description: 'Data Engineer (July - Dec 2024) • Automated quality assurance tools for data processing (Pydantic) • Project lead: nationwide clinic data network (privacy-focused) • Study data analysis with presentations • Tech: Python, R, SQL'
+      descriptionKey: 'projects.uniklinik.description'
     },
     {
       position: [15, 1, -5],
-      title: '🔬 Universität Ulm',
+      titleKey: 'projects.uni.title',
       color: '#2ecc71',
-      description: 'Research Assistant (Sept 2021 - Jan 2023) • Medical informatics research: smartphone/wearable health data • Publications in scientific journals • Supervised bachelor/master theses • Tech: Flutter, PySpark, MongoDB, FastAPI'
+      descriptionKey: 'projects.uni.description'
     },
     {
       position: [-15, 1, -5],
-      title: '🏭 Carl Zeiss MES',
+      titleKey: 'projects.zeiss.title',
       color: '#f39c12',
-      description: 'Frontend Developer (Oct 2023 - June 2024) • Angular applications for industrial measurement technology • Real-time features (WebSockets) for MES platform • Tech: Angular, Next.js, Docker, Azure, JIRA'
+      descriptionKey: 'projects.zeiss.description'
     },
     {
       position: [20, 1, 5],
-      title: '🔧 Liebherr Hausgeräte',
+      titleKey: 'projects.liebherr.title',
       color: '#1abc9c',
-      description: 'Software Engineer (Feb - Sept 2023) • Vue.js/.NET applications with data processing • Implemented CI/CD pipelines • Extended Kubernetes cluster • Tech: Vue.js, .NET, MS SQL, Kubernetes, Azure'
+      descriptionKey: 'projects.liebherr.description'
     },
   ];
 
-  // Social media objects
+  // Social media objects - using translation keys
   const socialMediaObjects: SocialMedia[] = [
     {
       position: [-25, 1, 15],
       type: 'linkedin',
       url: 'https://www.linkedin.com/in/fabshof',
-      title: 'LinkedIn Profile',
+      titleKey: 'social.linkedin.title',
       color: '#0077B5'
     },
     {
       position: [25, 1, 15],
       type: 'github',
       url: 'https://github.com/FabsHof',
-      title: 'GitHub Profile',
+      titleKey: 'social.github.title',
       color: '#333333'
     }
   ];
@@ -120,13 +125,13 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneConte
     <>
       <FollowCamera targetPosition={position} targetRotation={rotation} />
       <SpaceEnvironment />
-      <SpaceShuttle position={position} rotation={rotation} />
+      <FlyingSaucer position={position} rotation={rotationTuple} />
 
       {projects.map((project, index) => (
         <ProjectObject
           key={index}
           position={project.position}
-          title={project.title}
+          title={t(project.titleKey)}
           color={project.color}
           shuttlePosition={position}
         />
@@ -147,6 +152,7 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneConte
 }
 
 export function Scene() {
+  const { t } = useTranslation();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedSocial, setSelectedSocial] = useState<SocialMedia | null>(null);
   const [lastCollision, setLastCollision] = useState<string | null>(null);
@@ -154,10 +160,10 @@ export function Scene() {
 
   const handleProjectCollision = (project: Project) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== project.title && !closedPopups.has(project.title) && !selectedProject && !selectedSocial) {
+    if (lastCollision !== project.titleKey && !closedPopups.has(project.titleKey) && !selectedProject && !selectedSocial) {
       setSelectedProject(project);
       setSelectedSocial(null);
-      setLastCollision(project.title);
+      setLastCollision(project.titleKey);
 
       // Reset collision tracker after a delay
       setTimeout(() => setLastCollision(null), 3000);
@@ -166,19 +172,19 @@ export function Scene() {
 
   const handleSocialMediaCollision = (social: SocialMedia) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== social.title && !closedPopups.has(social.title) && !selectedProject && !selectedSocial) {
+    if (lastCollision !== social.titleKey && !closedPopups.has(social.titleKey) && !selectedProject && !selectedSocial) {
       setSelectedSocial(social);
       setSelectedProject(null);
-      setLastCollision(social.title);
+      setLastCollision(social.titleKey);
 
       // Reset collision tracker after a delay
       setTimeout(() => setLastCollision(null), 3000);
     }
   };
 
-  const handleClosePopup = (title: string) => {
+  const handleClosePopup = (titleKey: string) => {
     // Mark this popup as closed
-    setClosedPopups(prev => new Set(prev).add(title));
+    setClosedPopups(prev => new Set(prev).add(titleKey));
     setSelectedProject(null);
     setSelectedSocial(null);
 
@@ -186,7 +192,7 @@ export function Scene() {
     setTimeout(() => {
       setClosedPopups(prev => {
         const newSet = new Set(prev);
-        newSet.delete(title);
+        newSet.delete(titleKey);
         return newSet;
       });
     }, 5000);
@@ -209,20 +215,20 @@ export function Scene() {
 
       {selectedProject && (
         <ProjectPopup
-          title={selectedProject.title}
-          description={selectedProject.description}
+          title={t(selectedProject.titleKey)}
+          description={t(selectedProject.descriptionKey)}
           color={selectedProject.color}
-          onClose={() => handleClosePopup(selectedProject.title)}
+          onClose={() => handleClosePopup(selectedProject.titleKey)}
         />
       )}
 
       {selectedSocial && (
         <ProjectPopup
-          title={selectedSocial.title}
-          description={`Visit my ${selectedSocial.type === 'linkedin' ? 'LinkedIn' : 'GitHub'} profile to connect and see more of my work!`}
+          title={t(selectedSocial.titleKey)}
+          description={t(`social.${selectedSocial.type}.description`)}
           color={selectedSocial.color}
           url={selectedSocial.url}
-          onClose={() => handleClosePopup(selectedSocial.title)}
+          onClose={() => handleClosePopup(selectedSocial.titleKey)}
         />
       )}
     </div>

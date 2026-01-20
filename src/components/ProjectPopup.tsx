@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './ProjectPopup.css';
 
 interface ProjectPopupProps {
@@ -10,6 +11,8 @@ interface ProjectPopupProps {
 }
 
 export function ProjectPopup({ title, description, color, onClose, url }: ProjectPopupProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -68,13 +71,13 @@ export function ProjectPopup({ title, description, color, onClose, url }: Projec
                 className="visit-link-button"
                 style={{ backgroundColor: color }}
               >
-                Visit Profile →
+                {t('popup.visitProfile')} →
               </a>
             </div>
           )}
         </div>
         <div className="popup-footer">
-          <p>Press <strong>ESC</strong> or click anywhere to close</p>
+          <p dangerouslySetInnerHTML={{ __html: t('popup.close') }} />
         </div>
       </div>
     </div>
