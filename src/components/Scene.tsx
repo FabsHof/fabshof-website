@@ -1,11 +1,12 @@
 import { Canvas } from '@react-three/fiber';
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlyingSaucer } from './FlyingSaucer';
+import { SpaceShuttle } from './SpaceShuttle';
 import { SpaceEnvironment } from './SpaceEnvironment';
 import { ProjectObject } from './ProjectObject';
 import { SocialMediaObject } from './SocialMediaObject';
 import { ProjectPopup } from './ProjectPopup';
+import { ContactPopup } from './ContactPopup';
 import { FollowCamera } from './FollowCamera';
 import { useShuttleControls } from '../hooks/useShuttleControls';
 
@@ -27,14 +28,18 @@ interface SocialMedia {
 interface SceneContentProps {
   onProjectCollision: (project: Project) => void;
   onSocialMediaCollision: (social: SocialMedia) => void;
+  onContactCollision: () => void;
 }
 
-function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneContentProps) {
+function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCollision }: SceneContentProps) {
   const { position, rotation } = useShuttleControls();
   const { t } = useTranslation();
 
   // Convert rotation number to rotation tuple for Three.js
   const rotationTuple: [number, number, number] = [0, rotation, 0];
+
+  // Contact object position
+  const contactPosition: [number, number, number] = [0, 1, 20];
 
   // Real project positions based on work history - using translation keys
   const projects: Project[] = [
@@ -94,7 +99,7 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneConte
     }
   ];
 
-  // Check collision with projects and social media
+  // Check collision with projects, social media, and contact
   useEffect(() => {
     const collisionDistance = 3;
 
@@ -119,13 +124,22 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneConte
         onSocialMediaCollision(social);
       }
     });
+
+    // Check contact collision
+    const contactDx = position[0] - contactPosition[0];
+    const contactDz = position[2] - contactPosition[2];
+    const contactDistance = Math.sqrt(contactDx * contactDx + contactDz * contactDz);
+
+    if (contactDistance < collisionDistance) {
+      onContactCollision();
+    }
   }, [position]);
 
   return (
     <>
       <FollowCamera targetPosition={position} targetRotation={rotation} />
       <SpaceEnvironment />
-      <FlyingSaucer position={position} rotation={rotationTuple} />
+      <SpaceShuttle position={position} rotation={rotationTuple} />
 
       {projects.map((project, index) => (
         <ProjectObject
@@ -147,6 +161,14 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision }: SceneConte
           shuttlePosition={position}
         />
       ))}
+
+      {/* Contact object */}
+      <ProjectObject
+        position={contactPosition}
+        title={t('contact.title')}
+        color="#e91e63"
+        shuttlePosition={position}
+      />
     </>
   );
 }
@@ -155,14 +177,16 @@ export function Scene() {
   const { t } = useTranslation();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedSocial, setSelectedSocial] = useState<SocialMedia | null>(null);
+  const [showContact, setShowContact] = useState(false);
   const [lastCollision, setLastCollision] = useState<string | null>(null);
   const [closedPopups, setClosedPopups] = useState<Set<string>>(new Set());
 
   const handleProjectCollision = (project: Project) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== project.titleKey && !closedPopups.has(project.titleKey) && !selectedProject && !selectedSocial) {
+    if (lastCollision !== project.titleKey && !closedPopups.has(project.titleKey) && !selectedProject && !selectedSocial && !showContact) {
       setSelectedProject(project);
       setSelectedSocial(null);
+      setShowContact(false);
       setLastCollision(project.titleKey);
 
       // Reset collision tracker after a delay
@@ -172,10 +196,24 @@ export function Scene() {
 
   const handleSocialMediaCollision = (social: SocialMedia) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== social.titleKey && !closedPopups.has(social.titleKey) && !selectedProject && !selectedSocial) {
+    if (lastCollision !== social.titleKey && !closedPopups.has(social.titleKey) && !selectedProject && !selectedSocial && !showContact) {
       setSelectedSocial(social);
       setSelectedProject(null);
+      setShowContact(false);
       setLastCollision(social.titleKey);
+
+      // Reset collision tracker after a delay
+      setTimeout(() => setLastCollision(null), 3000);
+    }
+  };
+
+  const handleContactCollision = () => {
+    // Prevent reopening if popup is currently open or was recently closed
+    if (lastCollision !== 'contact' && !closedPopups.has('contact') && !selectedProject && !selectedSocial && !showContact) {
+      setShowContact(true);
+      setSelectedProject(null);
+      setSelectedSocial(null);
+      setLastCollision('contact');
 
       // Reset collision tracker after a delay
       setTimeout(() => setLastCollision(null), 3000);
@@ -187,6 +225,7 @@ export function Scene() {
     setClosedPopups(prev => new Set(prev).add(titleKey));
     setSelectedProject(null);
     setSelectedSocial(null);
+    setShowContact(false);
 
     // Clear the closed flag after the shuttle has time to move away
     setTimeout(() => {
@@ -209,6 +248,7 @@ export function Scene() {
           <SceneContent
             onProjectCollision={handleProjectCollision}
             onSocialMediaCollision={handleSocialMediaCollision}
+            onContactCollision={handleContactCollision}
           />
         </Suspense>
       </Canvas>
@@ -229,6 +269,12 @@ export function Scene() {
           color={selectedSocial.color}
           url={selectedSocial.url}
           onClose={() => handleClosePopup(selectedSocial.titleKey)}
+        />
+      )}
+
+      {showContact && (
+        <ContactPopup
+          onClose={() => handleClosePopup('contact')}
         />
       )}
     </div>

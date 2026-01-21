@@ -48,5 +48,15 @@
       "title": "GitHub-Profil",
       "description": "Besuche mein GitHub-Profil, um dich zu vernetzen und mehr über meine Arbeit zu erfahren!"
     }
+  },
+  "contact": {
+    "title": "Kontakt",
+    "name": "Dein Name",
+    "email": "Deine E-Mail",
+    "message": "Deine Nachricht",
+    "send": "Nachricht senden",
+    "sending": "E-Mail-Client wird geöffnet...",
+    "success": "Dein E-Mail-Client wird geöffnet...",
+    "error": "E-Mail-Client konnte nicht geöffnet werden. Bitte versuche es erneut."
   }
 }
