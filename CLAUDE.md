@@ -21,6 +21,8 @@ Users navigate a space shuttle through a 3D environment, colliding with floating
 - `ProjectObject.tsx` / `SocialMediaObject.tsx` - Floating 3D objects
 - `ProjectPopup.tsx` / `ContactPopup.tsx` - Info popups on collision
 - `PrivacyNotice.tsx` - Cookie/localStorage consent banner
+- `PrivacyPolicy.tsx` - Full GDPR privacy policy page (German only, accessed via footer link)
+- `Impressum.tsx` - Legal notice with credits section (German only, accessed via footer link)
 - `LanguageSwitcher.tsx` - DE/EN toggle
 
 ### Data Flow
@@ -38,6 +40,11 @@ Translation files in `src/locales/{en,de}.json`. Project/social descriptions use
 - **No analytics/tracking**: Only localStorage for consent and language preference
 - **Translation keys over strings**: All user-facing text uses i18next keys for full localization support
 - **Collision-based navigation**: Interactive discovery rather than traditional menu navigation
+
+## Assets & Credits
+
+<!-- Add asset sources/credits here -->
+-
 
 ## Notes for Future Sessions
 

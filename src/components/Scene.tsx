@@ -7,6 +7,7 @@ import { ProjectObject } from './ProjectObject';
 import { SocialMediaObject } from './SocialMediaObject';
 import { ProjectPopup } from './ProjectPopup';
 import { ContactPopup } from './ContactPopup';
+import { PrivacyNotice } from './PrivacyNotice';
 import { FollowCamera } from './FollowCamera';
 import { useShuttleControls } from '../hooks/useShuttleControls';
 
@@ -277,6 +278,8 @@ export function Scene() {
           onClose={() => handleClosePopup('contact')}
         />
       )}
+
+      <PrivacyNotice />
     </div>
   );
 }

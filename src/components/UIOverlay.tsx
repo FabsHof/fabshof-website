@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PrivacyPolicy } from './PrivacyPolicy';
+import { Impressum } from './Impressum';
 import './UIOverlay.css';
 
 export function UIOverlay() {
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showImpressum, setShowImpressum] = useState(false);
 
   useEffect(() => {
     const checkMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -80,7 +84,32 @@ export function UIOverlay() {
       {/* Footer */}
       <footer className="footer">
         <p>{t('navigation.explorePortfolio')}</p>
+        <div className="footer-links">
+          <button
+            className="footer-link"
+            onClick={() => setShowPrivacyPolicy(true)}
+          >
+            Datenschutz
+          </button>
+          <span className="footer-separator">|</span>
+          <button
+            className="footer-link"
+            onClick={() => setShowImpressum(true)}
+          >
+            Impressum
+          </button>
+        </div>
       </footer>
+
+      {/* Privacy Policy */}
+      {showPrivacyPolicy && (
+        <PrivacyPolicy onClose={() => setShowPrivacyPolicy(false)} />
+      )}
+
+      {/* Impressum */}
+      {showImpressum && (
+        <Impressum onClose={() => setShowImpressum(false)} />
+      )}
 
       {/* Toggle instructions button */}
       {!showInstructions && (

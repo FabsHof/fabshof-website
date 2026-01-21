@@ -58,5 +58,19 @@
     "sending": "E-Mail-Client wird geöffnet...",
     "success": "Dein E-Mail-Client wird geöffnet...",
     "error": "E-Mail-Client konnte nicht geöffnet werden. Bitte versuche es erneut."
+  },
+  "cookies": {
+    "title": "Datenschutz & Cookies",
+    "description": "Diese Website verwendet nur essenziellen lokalen Speicher, um deine Erfahrung zu verbessern. Es werden keine Drittanbieter-Tracking oder Analyse-Tools verwendet.",
+    "essential": {
+      "title": "Essenzieller Speicher",
+      "description": "Erforderlich für grundlegende Website-Funktionalität (deine Zustimmungswahl)."
+    },
+    "preferences": {
+      "title": "Präferenzen-Speicher",
+      "description": "Speichert deine Sprachauswahl (i18next)."
+    },
+    "accept": "Alle akzeptieren",
+    "decline": "Nur essenzielle"
   }
 }

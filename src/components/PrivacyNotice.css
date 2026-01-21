@@ -1,0 +1,163 @@
+.privacy-notice-overlay {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1500;
+  animation: slideInRight 0.5s ease;
+  max-width: 380px;
+  width: calc(100vw - 40px);
+  pointer-events: none;
+}
+
+.privacy-notice {
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.96) 0%, rgba(10, 10, 30, 0.96) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.privacy-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.privacy-content > p {
+  margin: 0 0 12px 0;
+  color: #d0d0d0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.privacy-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.privacy-category {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.privacy-category strong {
+  color: #a8b8ff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.privacy-category p {
+  margin: 0;
+  color: #b0b0b0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.privacy-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.privacy-btn {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.privacy-btn-decline {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d0d0d0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.privacy-btn-decline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.privacy-btn-accept {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.privacy-btn-accept:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .privacy-notice-overlay {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    width: auto;
+  }
+
+  .privacy-notice {
+    padding: 16px;
+  }
+
+  .privacy-content h3 {
+    font-size: 1rem;
+  }
+
+  .privacy-content > p {
+    font-size: 0.85rem;
+  }
+
+  .privacy-details {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .privacy-category strong {
+    font-size: 0.8rem;
+  }
+
+  .privacy-category p {
+    font-size: 0.75rem;
+  }
+
+  .privacy-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .privacy-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}

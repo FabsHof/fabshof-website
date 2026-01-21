@@ -58,5 +58,19 @@
     "sending": "Opening email client...",
     "success": "Opening your email client...",
     "error": "Could not open email client. Please try again."
+  },
+  "cookies": {
+    "title": "Privacy & Cookies",
+    "description": "This website uses only essential local storage to improve your experience. No third-party tracking or analytics are used.",
+    "essential": {
+      "title": "Essential Storage",
+      "description": "Required for basic website functionality (your consent choice)."
+    },
+    "preferences": {
+      "title": "Preference Storage",
+      "description": "Remembers your language selection (i18next)."
+    },
+    "accept": "Accept All",
+    "decline": "Essential Only"
   }
 }

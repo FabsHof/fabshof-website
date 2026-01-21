@@ -96,6 +96,34 @@
   text-align: center;
 }
 
+.footer-links {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footer-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  cursor: pointer;
+  pointer-events: all;
+  padding: 4px 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: rgba(102, 126, 234, 0.8);
+}
+
+.footer-separator {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+}
+
 .help-button {
   position: absolute;
   bottom: 20px;
