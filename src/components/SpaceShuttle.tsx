@@ -12,8 +12,8 @@ export function SpaceShuttle({ position, rotation }: SpaceShuttleProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/assets/Space Shuttle (D).glb');
 
-  // Clone the scene once using useMemo - remove scene from deps as it's stable
-  const clonedScene = useMemo(() => scene.clone(), []);
+  // Clone the scene once using useMemo
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
 
   // Ensure materials are properly set up - only run once
   useEffect(() => {
@@ -24,7 +24,7 @@ export function SpaceShuttle({ position, rotation }: SpaceShuttleProps) {
         mesh.receiveShadow = true;
       }
     });
-  }, []);
+  }, [clonedScene]);
 
   // Bounce animation - store bounce offset directly without state
   useFrame((state) => {

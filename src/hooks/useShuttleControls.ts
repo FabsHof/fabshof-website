@@ -42,16 +42,21 @@ export function useShuttleControls() {
       }
     };
 
-    // Request permission for iOS devices
+    // Request permission for iOS devices (typed to avoid `any`)
+    type DeviceOrientationWithRequest = {
+      requestPermission?: () => Promise<'granted' | 'denied' | 'default'>;
+    };
+
     const requestOrientationPermission = async () => {
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      const docAny = DeviceOrientationEvent as unknown as DeviceOrientationWithRequest;
+      if (typeof docAny.requestPermission === 'function') {
         try {
-          const permission = await (DeviceOrientationEvent as any).requestPermission();
+          const permission = await docAny.requestPermission();
           if (permission === 'granted') {
             window.addEventListener('deviceorientation', handleDeviceOrientation);
           }
-        } catch (error) {
-          console.error('Error requesting device orientation permission:', error);
+        } catch (err) {
+          console.error('Error requesting device orientation permission:', err);
         }
       } else {
         window.addEventListener('deviceorientation', handleDeviceOrientation);

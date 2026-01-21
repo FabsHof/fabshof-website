@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import * as THREE from 'three';
 
 // Pre-create shared geometries and materials outside component
@@ -30,22 +29,25 @@ const starsMaterial = new THREE.PointsMaterial({
   sizeAttenuation: false
 });
 
+// Pre-generate star positions once at module load to avoid calling Math.random during render
+const sharedStarsGeometry = (() => {
+  const geometry = new THREE.BufferGeometry();
+  const starPositions = new Float32Array(2000 * 3); // Reduced from 5000
+
+  for (let i = 0; i < 2000; i++) {
+    const i3 = i * 3;
+    starPositions[i3] = (Math.random() - 0.5) * 200;
+    starPositions[i3 + 1] = (Math.random() - 0.5) * 200;
+    starPositions[i3 + 2] = (Math.random() - 0.5) * 200;
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  return geometry;
+})();
+
 export function SpaceEnvironment() {
-  // Generate random stars once and memoize - reduced count
-  const starsGeometry = useMemo(() => {
-    const geometry = new THREE.BufferGeometry();
-    const starPositions = new Float32Array(2000 * 3); // Reduced from 5000
-
-    for (let i = 0; i < 2000; i++) {
-      const i3 = i * 3;
-      starPositions[i3] = (Math.random() - 0.5) * 200;
-      starPositions[i3 + 1] = (Math.random() - 0.5) * 200;
-      starPositions[i3 + 2] = (Math.random() - 0.5) * 200;
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    return geometry;
-  }, []);
+  // Use pre-generated stars geometry
+  const starsGeometry = sharedStarsGeometry;
 
   return (
     <>

@@ -35,7 +35,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
       setTimeout(() => {
         onClose();
       }, 2000);
-    } catch (error) {
+    } catch {
       setStatus('error');
     }
   };

@@ -1,5 +1,5 @@
 import { useRef, useState, useMemo } from 'react';
-import { Group, CylinderGeometry, TorusGeometry, CircleGeometry, MeshStandardMaterial } from 'three';
+import { Group, CylinderGeometry, TorusGeometry, CircleGeometry, MeshStandardMaterial, Mesh } from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 
@@ -37,6 +37,7 @@ const pedestalMaterial = new MeshStandardMaterial({
 
 export function SocialMediaObject({ position, type, shuttlePosition }: SocialMediaObjectProps) {
   const groupRef = useRef<Group>(null);
+  const badgeMeshRef = useRef<Mesh>(null);
   const labelGroupRef = useRef<Group>(null);
   const hintGroupRef = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -44,7 +45,8 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
 
   // Store mutable values in refs to avoid state updates in useFrame
   const rotationRef = useRef(0);
-  const proximityGlowRef = useRef(0);
+  // Use state for light intensity so it can be read during render
+  const [lightIntensity, setLightIntensity] = useState(0.3);
 
   const isLinkedIn = type === 'linkedin';
   const color = isLinkedIn ? '#0077B5' : '#24292e';
@@ -75,13 +77,21 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
 
       // Glow intensity increases as shuttle gets closer (max distance 15 units)
       const glowStrength = Math.max(0, 1 - distance / 15);
-      proximityGlowRef.current = glowStrength;
 
-      // Update material emissive intensity directly
+      // Compute light intensity for point light and update state
+      const baseLI = 0.3;
+      const hoverLI = hovered ? 1.0 : 0;
+      const proximityLI = glowStrength * 5;
+      setLightIntensity(baseLI + hoverLI + proximityLI);
+
+      // Update material emissive intensity on the badge mesh material
       const baseEmissive = 0.05;
       const hoverEmissive = hovered ? 0.15 : 0;
       const proximityEmissive = glowStrength * 0.6;
-      badgeMaterial.emissiveIntensity = baseEmissive + hoverEmissive + proximityEmissive;
+      if (badgeMeshRef.current) {
+        const mat = badgeMeshRef.current.material as MeshStandardMaterial;
+        mat.emissiveIntensity = baseEmissive + hoverEmissive + proximityEmissive;
+      }
 
       // Calculate and apply scale
       const baseScale = 0.5;
@@ -100,12 +110,6 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
     }
   });
 
-  // Calculate light intensity
-  const baseLightIntensity = 0.3;
-  const hoverLightIntensity = hovered ? 1.0 : 0;
-  const proximityLightIntensity = proximityGlowRef.current * 5;
-  const totalLightIntensity = baseLightIntensity + hoverLightIntensity + proximityLightIntensity;
-
   return (
     <group position={position}>
       <group
@@ -115,6 +119,7 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
       >
         {/* Circular badge background - rotated 90 so it faces outward */}
         <mesh
+          ref={badgeMeshRef}
           castShadow
           rotation={[Math.PI / 2, 0, 0]}
           geometry={sharedBadgeGeometry}
@@ -170,7 +175,7 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
       </group>
 
       {/* Glow effect */}
-      <pointLight color={color} intensity={totalLightIntensity} distance={8} />
+      <pointLight color={color} intensity={lightIntensity} distance={8} />
 
       {/* Floating text label */}
       <group ref={labelGroupRef} position={[0, 2.5, 0]}>

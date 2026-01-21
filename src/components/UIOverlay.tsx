@@ -6,17 +6,12 @@ import './UIOverlay.css';
 
 export function UIOverlay() {
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [showImpressum, setShowImpressum] = useState(false);
 
   useEffect(() => {
-    const checkMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-    setIsMobile(checkMobile);
-
     const timer = setTimeout(() => {
       setShowInstructions(false);
     }, 8000);
