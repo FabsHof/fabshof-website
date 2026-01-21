@@ -32,11 +32,7 @@ export function FollowCamera({ targetPosition, targetRotation }: FollowCameraPro
       targetPosition[2] + offsetZ
     );
 
-    targetLookAtPosition.current.set(
-      targetPosition[0],
-      targetPosition[1] + 1,
-      targetPosition[2]
-    );
+    targetLookAtPosition.current.set(targetPosition[0], targetPosition[1] + 1, targetPosition[2]);
 
     // Smooth camera movement using lerp
     currentPosition.current.lerp(targetCameraPosition.current, 0.05);

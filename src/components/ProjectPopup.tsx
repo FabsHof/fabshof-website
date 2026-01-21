@@ -12,7 +12,14 @@ interface ProjectPopupProps {
   iconType?: 'linkedin' | 'github';
 }
 
-export function ProjectPopup({ title, description, color, onClose, url, iconType }: ProjectPopupProps) {
+export function ProjectPopup({
+  title,
+  description,
+  color,
+  onClose,
+  url,
+  iconType,
+}: ProjectPopupProps) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -34,7 +41,7 @@ export function ProjectPopup({ title, description, color, onClose, url, iconType
     if (match) {
       return {
         emoji: match[0],
-        cleanTitle: text.slice(match[0].length).trim()
+        cleanTitle: text.slice(match[0].length).trim(),
       };
     }
     return { emoji: null, cleanTitle: text };
@@ -50,8 +57,8 @@ export function ProjectPopup({ title, description, color, onClose, url, iconType
 
     return techMatch[1]
       .split(',')
-      .map(tech => tech.trim())
-      .filter(tech => tech.length > 0)
+      .map((tech) => tech.trim())
+      .filter((tech) => tech.length > 0)
       .slice(0, 6); // Limit to 6 tags
   };
 
@@ -60,13 +67,15 @@ export function ProjectPopup({ title, description, color, onClose, url, iconType
   return (
     <div className="project-popup-overlay" onClick={onClose}>
       <div className="project-popup" onClick={(e) => e.stopPropagation()}>
-        <button className="popup-close" onClick={onClose}>×</button>
+        <button className="popup-close" onClick={onClose}>
+          ×
+        </button>
         <div className="popup-header" style={{ borderColor: color }}>
           <div
             className="popup-icon"
             style={{
               backgroundColor: color,
-              boxShadow: `0 0 20px ${color}`
+              boxShadow: `0 0 20px ${color}`,
             }}
           >
             {iconType === 'linkedin' && <FaLinkedinIn className="popup-react-icon" />}
@@ -80,7 +89,9 @@ export function ProjectPopup({ title, description, color, onClose, url, iconType
           {!url && techTags.length > 0 && (
             <div className="popup-tags">
               {techTags.map((tag, index) => (
-                <span key={index} className="tag">{tag}</span>
+                <span key={index} className="tag">
+                  {tag}
+                </span>
               ))}
             </div>
           )}

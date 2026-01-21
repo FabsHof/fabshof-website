@@ -57,6 +57,7 @@ npm run preview
 ```
 
 The production build will be output to the `dist` directory with:
+
 - Minified code (console logs and debugger statements removed)
 - Code splitting (separate chunks for Three.js and React Three libraries)
 - Optimized assets
@@ -95,6 +96,7 @@ const projects = [
 ### Adjusting Controls
 
 Modify [src/hooks/useShuttleControls.ts](src/hooks/useShuttleControls.ts) to adjust:
+
 - Acceleration speed
 - Max speed
 - Rotation speed
@@ -104,6 +106,7 @@ Modify [src/hooks/useShuttleControls.ts](src/hooks/useShuttleControls.ts) to adj
 ### Styling
 
 Update colors and styling in:
+
 - [src/components/UIOverlay.css](src/components/UIOverlay.css) - UI overlay styles
 - [src/components/SpaceShuttle.tsx](src/components/SpaceShuttle.tsx) - Shuttle colors and materials
 - [src/components/ProjectObject.tsx](src/components/ProjectObject.tsx) - Project object appearance
@@ -111,6 +114,7 @@ Update colors and styling in:
 ## Controls
 
 ### Desktop
+
 - **Arrow Up**: Move forward
 - **Arrow Down**: Move backward
 - **Arrow Left**: Rotate left
@@ -119,6 +123,7 @@ Update colors and styling in:
 - **Scroll**: Zoom in/out
 
 ### Mobile
+
 - **Tilt Device**: Navigate the shuttle
 - **Touch**: Orbit camera view (drag)
 - **Pinch**: Zoom in/out
@@ -126,15 +131,63 @@ Update colors and styling in:
 ## Performance
 
 The application is optimized for performance with:
+
 - Hardware-accelerated WebGL rendering
 - Efficient 3D model geometry
 - Proper code splitting
 - Production minification
 - Shadow mapping for realistic lighting
 
+## Code Quality
+
+### Linting & Formatting
+
+This project uses ESLint and Prettier for consistent code quality:
+
+```bash
+# Check code style
+npm run lint
+
+# Auto-fix ESLint issues
+npm run lint:fix
+
+# Format all files with Prettier
+npm run format
+
+# Check formatting (used in CI)
+npm run format:check
+```
+
+### Pre-commit Hooks
+
+Husky + lint-staged automatically run on every commit to ensure code quality:
+
+- **TypeScript/TSX files**: ESLint fix + Prettier format
+- **Other files** (JS, JSON, CSS, MD): Prettier format
+
+### VS Code Integration
+
+The project includes VS Code settings for the best developer experience:
+
+- **Format on save** enabled
+- **ESLint auto-fix** on save
+- Recommended extensions: Prettier + ESLint
+
+Install recommended extensions when prompted, or run:
+`Extensions: Show Recommended Extensions` from the command palette.
+
+### CI/CD
+
+Pull requests are automatically checked for:
+
+1. ✅ Formatting (Prettier)
+2. ✅ Linting (ESLint)
+3. ✅ Build success
+
 ## Browser Compatibility
 
 Works best on modern browsers with WebGL 2.0 support:
+
 - Chrome/Edge 80+
 - Firefox 75+
 - Safari 14+

@@ -14,16 +14,16 @@ import { useShuttleControls } from '../hooks/useShuttleControls';
 
 interface Project {
   position: [number, number, number];
-  titleKey: string;  // Translation key instead of translated title
+  titleKey: string; // Translation key instead of translated title
   color: string;
-  descriptionKey: string;  // Translation key instead of translated description
+  descriptionKey: string; // Translation key instead of translated description
 }
 
 interface SocialMedia {
   position: [number, number, number];
   type: 'linkedin' | 'github';
   url: string;
-  titleKey: string;  // Translation key instead of translated title
+  titleKey: string; // Translation key instead of translated title
   color: string;
 }
 
@@ -39,37 +39,37 @@ const PROJECTS: Project[] = [
     position: [-8, 1, -20],
     titleKey: 'projects.bioexotec.title',
     color: '#9b59b6',
-    descriptionKey: 'projects.bioexotec.description'
+    descriptionKey: 'projects.bioexotec.description',
   },
   {
     position: [8, 1, -20],
     titleKey: 'projects.ghz.title',
     color: '#4a90e2',
-    descriptionKey: 'projects.ghz.description'
+    descriptionKey: 'projects.ghz.description',
   },
   {
     position: [-12, 1, -10],
     titleKey: 'projects.uniklinik.title',
     color: '#e74c3c',
-    descriptionKey: 'projects.uniklinik.description'
+    descriptionKey: 'projects.uniklinik.description',
   },
   {
     position: [12, 1, -10],
     titleKey: 'projects.uni.title',
     color: '#2ecc71',
-    descriptionKey: 'projects.uni.description'
+    descriptionKey: 'projects.uni.description',
   },
   {
     position: [-8, 1, -5],
     titleKey: 'projects.zeiss.title',
     color: '#f39c12',
-    descriptionKey: 'projects.zeiss.description'
+    descriptionKey: 'projects.zeiss.description',
   },
   {
     position: [8, 1, -5],
     titleKey: 'projects.liebherr.title',
     color: '#1abc9c',
-    descriptionKey: 'projects.liebherr.description'
+    descriptionKey: 'projects.liebherr.description',
   },
 ];
 
@@ -79,15 +79,15 @@ const SOCIAL_MEDIA: SocialMedia[] = [
     type: 'linkedin',
     url: 'https://www.linkedin.com/in/fabshof',
     titleKey: 'social.linkedin.title',
-    color: '#0077B5'
+    color: '#0077B5',
   },
   {
     position: [25, 1, 5],
     type: 'github',
     url: 'https://github.com/FabsHof',
     titleKey: 'social.github.title',
-    color: '#333333'
-  }
+    color: '#333333',
+  },
 ];
 
 const CONTACT_POSITION: [number, number, number] = [0, 1, 20];
@@ -98,7 +98,11 @@ const CONTACT_GROUP_CENTER: [number, number, number] = [0, 1, 25];
 const EMPLOYERS_GROUP_CENTER: [number, number, number] = [0, 1, -15];
 const SOCIAL_GROUP_CENTER: [number, number, number] = [30, 1, 0];
 
-function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCollision }: SceneContentProps) {
+function SceneContent({
+  onProjectCollision,
+  onSocialMediaCollision,
+  onContactCollision,
+}: SceneContentProps) {
   const { position, rotation } = useShuttleControls();
   const { t } = useTranslation();
   const lastCheckRef = useRef(0);
@@ -153,7 +157,11 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
       <SpaceShuttle position={position} rotation={rotationTuple} />
 
       {/* Nebula group labels */}
-      <NebulaLabel position={EMPLOYERS_GROUP_CENTER} label={t('groups.employers')} color="#667eea" />
+      <NebulaLabel
+        position={EMPLOYERS_GROUP_CENTER}
+        label={t('groups.employers')}
+        color="#667eea"
+      />
       <NebulaLabel position={CONTACT_GROUP_CENTER} label={t('groups.contact')} color="#e91e63" />
       <NebulaLabel position={SOCIAL_GROUP_CENTER} label={t('groups.connect')} color="#0077B5" />
 
@@ -200,7 +208,13 @@ export function Scene() {
 
   const handleProjectCollision = (project: Project) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== project.titleKey && !closedPopups.has(project.titleKey) && !selectedProject && !selectedSocial && !showContact) {
+    if (
+      lastCollision !== project.titleKey &&
+      !closedPopups.has(project.titleKey) &&
+      !selectedProject &&
+      !selectedSocial &&
+      !showContact
+    ) {
       setSelectedProject(project);
       setSelectedSocial(null);
       setShowContact(false);
@@ -213,7 +227,13 @@ export function Scene() {
 
   const handleSocialMediaCollision = (social: SocialMedia) => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== social.titleKey && !closedPopups.has(social.titleKey) && !selectedProject && !selectedSocial && !showContact) {
+    if (
+      lastCollision !== social.titleKey &&
+      !closedPopups.has(social.titleKey) &&
+      !selectedProject &&
+      !selectedSocial &&
+      !showContact
+    ) {
       setSelectedSocial(social);
       setSelectedProject(null);
       setShowContact(false);
@@ -226,7 +246,13 @@ export function Scene() {
 
   const handleContactCollision = () => {
     // Prevent reopening if popup is currently open or was recently closed
-    if (lastCollision !== 'contact' && !closedPopups.has('contact') && !selectedProject && !selectedSocial && !showContact) {
+    if (
+      lastCollision !== 'contact' &&
+      !closedPopups.has('contact') &&
+      !selectedProject &&
+      !selectedSocial &&
+      !showContact
+    ) {
       setShowContact(true);
       setSelectedProject(null);
       setSelectedSocial(null);
@@ -239,14 +265,14 @@ export function Scene() {
 
   const handleClosePopup = (titleKey: string) => {
     // Mark this popup as closed
-    setClosedPopups(prev => new Set(prev).add(titleKey));
+    setClosedPopups((prev) => new Set(prev).add(titleKey));
     setSelectedProject(null);
     setSelectedSocial(null);
     setShowContact(false);
 
     // Clear the closed flag after the shuttle has time to move away
     setTimeout(() => {
-      setClosedPopups(prev => {
+      setClosedPopups((prev) => {
         const newSet = new Set(prev);
         newSet.delete(titleKey);
         return newSet;
@@ -290,11 +316,7 @@ export function Scene() {
         />
       )}
 
-      {showContact && (
-        <ContactPopup
-          onClose={() => handleClosePopup('contact')}
-        />
-      )}
+      {showContact && <ContactPopup onClose={() => handleClosePopup('contact')} />}
 
       <PrivacyNotice />
     </div>

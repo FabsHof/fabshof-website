@@ -10,7 +10,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
-    message: ''
+    message: '',
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
@@ -35,7 +35,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
       setTimeout(() => {
         onClose();
       }, 2000);
-    } catch (error) {
+    } catch {
       setStatus('error');
     }
   };
@@ -43,14 +43,16 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   return (
     <div className="project-popup-overlay" onClick={onClose}>
       <div className="project-popup" onClick={(e) => e.stopPropagation()}>
-        <button className="popup-close" onClick={onClose}>×</button>
+        <button className="popup-close" onClick={onClose}>
+          ×
+        </button>
         <h2 style={{ color: '#4a90e2' }}>📧 {t('contact.title')}</h2>
 
         {status === 'success' ? (
@@ -85,11 +87,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
               />
             </div>
 
-            {status === 'error' && (
-              <div className="contact-error">
-                {t('contact.error')}
-              </div>
-            )}
+            {status === 'error' && <div className="contact-error">{t('contact.error')}</div>}
 
             <button type="submit" disabled={status === 'sending'}>
               {status === 'sending' ? t('contact.sending') : t('contact.send')}

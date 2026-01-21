@@ -19,11 +19,14 @@ export function NebulaLabel({ position, label, color = '#667eea' }: NebulaLabelP
   const { camera } = useThree();
 
   // Memoize materials since they depend on color prop
-  const materials = useMemo(() => ({
-    outer: new MeshBasicMaterial({ color, transparent: true, opacity: 0.08 }),
-    middle: new MeshBasicMaterial({ color, transparent: true, opacity: 0.1 }),
-    inner: new MeshBasicMaterial({ color, transparent: true, opacity: 0.12 })
-  }), [color]);
+  const materials = useMemo(
+    () => ({
+      outer: new MeshBasicMaterial({ color, transparent: true, opacity: 0.08 }),
+      middle: new MeshBasicMaterial({ color, transparent: true, opacity: 0.1 }),
+      inner: new MeshBasicMaterial({ color, transparent: true, opacity: 0.12 }),
+    }),
+    [color]
+  );
 
   // Billboard effect - always face camera
   useFrame(() => {

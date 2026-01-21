@@ -14,7 +14,12 @@ interface ProjectObjectProps {
 const sharedSphereGeometry = new SphereGeometry(1, 16, 16); // Reduced from 32 segments
 const sharedPedestalGeometry = new CylinderGeometry(0.6, 0.8, 0.2, 8);
 
-export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosition }: ProjectObjectProps) {
+export function ProjectObject({
+  position,
+  title,
+  color = '#4a90e2',
+  shuttlePosition,
+}: ProjectObjectProps) {
   const meshRef = useRef<Mesh>(null);
   const textGroupRef = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -22,24 +27,33 @@ export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosit
 
   // Store mutable values in refs to avoid state updates in useFrame
   const rotationRef = useRef(0);
-  const proximityGlowRef = useRef(0);
+  // Use state for light intensity so it can be read during render
+  const [lightIntensity, setLightIntensity] = useState(0.3);
 
   // Memoize materials
-  const sphereMaterial = useMemo(() => new MeshStandardMaterial({
-    color: color,
-    metalness: 0.3,
-    roughness: 0.7,
-    emissive: color,
-    emissiveIntensity: 0.05
-  }), [color]);
+  const sphereMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        color: color,
+        metalness: 0.3,
+        roughness: 0.7,
+        emissive: color,
+        emissiveIntensity: 0.05,
+      }),
+    [color]
+  );
 
-  const pedestalMaterial = useMemo(() => new MeshStandardMaterial({
-    color: '#1a1a2e',
-    metalness: 0.9,
-    roughness: 0.1,
-    transparent: true,
-    opacity: 0.6
-  }), []);
+  const pedestalMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        color: '#1a1a2e',
+        metalness: 0.9,
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.6,
+      }),
+    []
+  );
 
   useFrame((state, delta) => {
     if (meshRef.current) {
@@ -57,13 +71,21 @@ export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosit
 
       // Glow intensity increases as shuttle gets closer (max distance 15 units)
       const glowStrength = Math.max(0, 1 - distance / 15);
-      proximityGlowRef.current = glowStrength;
 
-      // Update material emissive intensity directly
+      // Compute light intensity for point light and update state
+      const baseLI = 0.3;
+      const hoverLI = hovered ? 1.0 : 0;
+      const proximityLI = glowStrength * 5;
+      setLightIntensity(baseLI + hoverLI + proximityLI);
+
+      // Update material emissive intensity on the actual mesh material (avoid mutating hook-created value)
       const baseEmissive = 0.05;
       const hoverEmissive = hovered ? 0.15 : 0;
       const proximityEmissive = glowStrength * 0.6;
-      sphereMaterial.emissiveIntensity = baseEmissive + hoverEmissive + proximityEmissive;
+      if (meshRef.current) {
+        const mat = meshRef.current.material as MeshStandardMaterial;
+        mat.emissiveIntensity = baseEmissive + hoverEmissive + proximityEmissive;
+      }
 
       // Calculate scale
       const baseScale = 0.5;
@@ -79,12 +101,6 @@ export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosit
     }
   });
 
-  // Calculate light intensity based on proximity (updated less frequently via hover state changes)
-  const baseLightIntensity = 0.3;
-  const hoverLightIntensity = hovered ? 1.0 : 0;
-  const proximityLightIntensity = proximityGlowRef.current * 5;
-  const totalLightIntensity = baseLightIntensity + hoverLightIntensity + proximityLightIntensity;
-
   return (
     <group position={position}>
       {/* Main object - planet sphere */}
@@ -98,7 +114,7 @@ export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosit
       />
 
       {/* Glow effect with proximity-based intensity */}
-      <pointLight color={color} intensity={totalLightIntensity} distance={8} />
+      <pointLight color={color} intensity={lightIntensity} distance={8} />
 
       {/* Floating text label - always faces camera */}
       <group ref={textGroupRef} position={[0, 2.5, 0]}>
