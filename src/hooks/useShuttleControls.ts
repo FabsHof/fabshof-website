@@ -1,4 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import {
+  getCalibratedOrientation,
+  isOrientationListenerActive,
+  isMobileDevice,
+  startOrientationListening,
+  cleanup,
+} from '../utils/deviceOrientation';
 
 interface ShuttleState {
   position: [number, number, number];
@@ -6,7 +13,7 @@ interface ShuttleState {
   velocity: { x: number; z: number };
 }
 
-export function useShuttleControls() {
+export function useShuttleControls(disabled = false) {
   const [shuttleState, setShuttleState] = useState<ShuttleState>({
     position: [0, 2, 0],
     rotation: 0,
@@ -14,14 +21,17 @@ export function useShuttleControls() {
   });
 
   const keysPressed = useRef<Set<string>>(new Set());
-  const deviceOrientation = useRef({ beta: 0, gamma: 0 });
   const isMobile = useRef(false);
+  const disabledRef = useRef(disabled);
+
+  // Keep the ref in sync with the prop
+  useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
 
   useEffect(() => {
     // Check if device is mobile
-    isMobile.current = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+    isMobile.current = isMobileDevice();
 
     // Keyboard event handlers
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -32,42 +42,12 @@ export function useShuttleControls() {
       keysPressed.current.delete(e.key);
     };
 
-    // Device orientation handler for mobile
-    const handleDeviceOrientation = (e: DeviceOrientationEvent) => {
-      if (e.beta !== null && e.gamma !== null) {
-        deviceOrientation.current = {
-          beta: e.beta,
-          gamma: e.gamma,
-        };
-      }
-    };
-
-    // Request permission for iOS devices (typed to avoid `any`)
-    type DeviceOrientationWithRequest = {
-      requestPermission?: () => Promise<'granted' | 'denied' | 'default'>;
-    };
-
-    const requestOrientationPermission = async () => {
-      const docAny = DeviceOrientationEvent as unknown as DeviceOrientationWithRequest;
-      if (typeof docAny.requestPermission === 'function') {
-        try {
-          const permission = await docAny.requestPermission();
-          if (permission === 'granted') {
-            window.addEventListener('deviceorientation', handleDeviceOrientation);
-          }
-        } catch (err) {
-          console.error('Error requesting device orientation permission:', err);
-        }
-      } else {
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
-      }
-    };
-
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
+    // For non-iOS mobile devices, start listening immediately
     if (isMobile.current) {
-      requestOrientationPermission();
+      startOrientationListening();
     }
 
     // Animation loop for smooth movement
@@ -77,44 +57,50 @@ export function useShuttleControls() {
         let newRotation = prev.rotation;
 
         const acceleration = 0.015;
+        const mobileAcceleration = 0.025; // Faster for mobile
         const friction = 0.92;
-        const maxSpeed = 0.3;
+        const maxSpeed = 0.4; // Increased max speed
         const rotationSpeed = 0.04;
+        const mobileRotationSpeed = 0.06;
 
-        if (isMobile.current) {
-          // Mobile: use device orientation
-          const { beta, gamma } = deviceOrientation.current;
+        // Skip input processing when disabled, but still apply friction
+        if (!disabledRef.current) {
+          if (isMobile.current && isOrientationListenerActive()) {
+            // Mobile: use calibrated device orientation
+            const { tiltForward, tiltSide } = getCalibratedOrientation();
 
-          // Tilt forward/backward (beta: -90 to 90)
-          const tiltForward = Math.max(-1, Math.min(1, (beta - 45) / 30));
-          // Tilt left/right (gamma: -90 to 90)
-          const tiltSide = Math.max(-1, Math.min(1, gamma / 30));
+            // Tilt forward/backward moves the shuttle in the direction it's facing
+            if (Math.abs(tiltForward) > 0.05) {
+              // Small deadzone
+              vz += Math.cos(newRotation) * tiltForward * mobileAcceleration;
+              vx += Math.sin(newRotation) * tiltForward * mobileAcceleration;
+            }
 
-          // Apply acceleration based on tilt
-          vz += tiltForward * acceleration;
-          vx += tiltSide * acceleration;
-
-          // Rotate shuttle based on horizontal tilt
-          newRotation = -tiltSide * 0.5;
-        } else {
-          // Desktop: use arrow keys
-          if (keysPressed.current.has('ArrowUp')) {
-            vz += Math.cos(newRotation) * acceleration;
-            vx += Math.sin(newRotation) * acceleration;
-          }
-          if (keysPressed.current.has('ArrowDown')) {
-            vz -= Math.cos(newRotation) * acceleration;
-            vx -= Math.sin(newRotation) * acceleration;
-          }
-          if (keysPressed.current.has('ArrowLeft')) {
-            newRotation += rotationSpeed;
-          }
-          if (keysPressed.current.has('ArrowRight')) {
-            newRotation -= rotationSpeed;
+            // Tilt left/right rotates the shuttle (not moving sideways)
+            if (Math.abs(tiltSide) > 0.05) {
+              // Small deadzone
+              newRotation -= tiltSide * mobileRotationSpeed;
+            }
+          } else if (!isMobile.current) {
+            // Desktop: use arrow keys
+            if (keysPressed.current.has('ArrowUp')) {
+              vz += Math.cos(newRotation) * acceleration;
+              vx += Math.sin(newRotation) * acceleration;
+            }
+            if (keysPressed.current.has('ArrowDown')) {
+              vz -= Math.cos(newRotation) * acceleration;
+              vx -= Math.sin(newRotation) * acceleration;
+            }
+            if (keysPressed.current.has('ArrowLeft')) {
+              newRotation += rotationSpeed;
+            }
+            if (keysPressed.current.has('ArrowRight')) {
+              newRotation -= rotationSpeed;
+            }
           }
         }
 
-        // Apply friction
+        // Apply friction (always, even when disabled to slow down)
         vx *= friction;
         vz *= friction;
 
@@ -149,10 +135,10 @@ export function useShuttleControls() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      cleanup();
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
-  return shuttleState;
+  return { shuttleState };
 }

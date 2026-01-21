@@ -31,6 +31,7 @@ interface SceneContentProps {
   onProjectCollision: (project: Project) => void;
   onSocialMediaCollision: (social: SocialMedia) => void;
   onContactCollision: () => void;
+  navigationDisabled: boolean;
 }
 
 // Static data defined outside component to prevent recreation
@@ -102,8 +103,10 @@ function SceneContent({
   onProjectCollision,
   onSocialMediaCollision,
   onContactCollision,
+  navigationDisabled,
 }: SceneContentProps) {
-  const { position, rotation } = useShuttleControls();
+  const { shuttleState } = useShuttleControls(navigationDisabled);
+  const { position, rotation } = shuttleState;
   const { t } = useTranslation();
   const lastCheckRef = useRef(0);
 
@@ -292,6 +295,7 @@ export function Scene() {
             onProjectCollision={handleProjectCollision}
             onSocialMediaCollision={handleSocialMediaCollision}
             onContactCollision={handleContactCollision}
+            navigationDisabled={!!(selectedProject || selectedSocial || showContact)}
           />
         </Suspense>
       </Canvas>

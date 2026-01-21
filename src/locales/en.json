@@ -2,9 +2,14 @@
   "navigation": {
     "controls": "Controls",
     "arrowKeys": "Arrow Keys",
-    "tiltDevice": "Tilt Device",
+    "tiltDevice": "Tilt your device to navigate",
+    "tiltInstructions": "Tilt forward/back to move, tilt left/right to turn",
     "explorePortfolio": "Navigate through space to explore my portfolio",
-    "clickToDismiss": "Click to dismiss"
+    "clickToDismiss": "Click to dismiss",
+    "enableMotion": "Enable Motion Controls",
+    "motionEnabled": "Motion controls enabled!",
+    "permissionDenied": "Motion sensor access was denied. Please enable it in your device settings to use tilt controls.",
+    "recalibrate": "Recalibrate"
   },
   "groups": {
     "employers": "Experience",
