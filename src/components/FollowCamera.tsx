@@ -12,6 +12,10 @@ export function FollowCamera({ targetPosition, targetRotation }: FollowCameraPro
   const currentPosition = useRef(new Vector3(0, 10, 10));
   const currentLookAt = useRef(new Vector3(0, 2, 0));
 
+  // Pre-allocate reusable Vector3 objects to avoid allocations in useFrame
+  const targetCameraPosition = useRef(new Vector3());
+  const targetLookAtPosition = useRef(new Vector3());
+
   useFrame(() => {
     // Calculate camera position behind the shuttle at 45-degree angle
     const distance = 12;
@@ -21,21 +25,22 @@ export function FollowCamera({ targetPosition, targetRotation }: FollowCameraPro
     const offsetX = -Math.sin(targetRotation) * distance;
     const offsetZ = -Math.cos(targetRotation) * distance;
 
-    const targetCameraPosition = new Vector3(
+    // Reuse pre-allocated Vector3 objects
+    targetCameraPosition.current.set(
       targetPosition[0] + offsetX,
       targetPosition[1] + height,
       targetPosition[2] + offsetZ
     );
 
-    const targetLookAtPosition = new Vector3(
+    targetLookAtPosition.current.set(
       targetPosition[0],
       targetPosition[1] + 1,
       targetPosition[2]
     );
 
     // Smooth camera movement using lerp
-    currentPosition.current.lerp(targetCameraPosition, 0.05);
-    currentLookAt.current.lerp(targetLookAtPosition, 0.05);
+    currentPosition.current.lerp(targetCameraPosition.current, 0.05);
+    currentLookAt.current.lerp(targetLookAtPosition.current, 0.05);
 
     camera.position.copy(currentPosition.current);
     camera.lookAt(currentLookAt.current);

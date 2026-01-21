@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SpaceShuttle } from './SpaceShuttle';
 import { SpaceEnvironment } from './SpaceEnvironment';
@@ -33,114 +33,118 @@ interface SceneContentProps {
   onContactCollision: () => void;
 }
 
+// Static data defined outside component to prevent recreation
+const PROJECTS: Project[] = [
+  {
+    position: [-8, 1, -20],
+    titleKey: 'projects.bioexotec.title',
+    color: '#9b59b6',
+    descriptionKey: 'projects.bioexotec.description'
+  },
+  {
+    position: [8, 1, -20],
+    titleKey: 'projects.ghz.title',
+    color: '#4a90e2',
+    descriptionKey: 'projects.ghz.description'
+  },
+  {
+    position: [-12, 1, -10],
+    titleKey: 'projects.uniklinik.title',
+    color: '#e74c3c',
+    descriptionKey: 'projects.uniklinik.description'
+  },
+  {
+    position: [12, 1, -10],
+    titleKey: 'projects.uni.title',
+    color: '#2ecc71',
+    descriptionKey: 'projects.uni.description'
+  },
+  {
+    position: [-8, 1, -5],
+    titleKey: 'projects.zeiss.title',
+    color: '#f39c12',
+    descriptionKey: 'projects.zeiss.description'
+  },
+  {
+    position: [8, 1, -5],
+    titleKey: 'projects.liebherr.title',
+    color: '#1abc9c',
+    descriptionKey: 'projects.liebherr.description'
+  },
+];
+
+const SOCIAL_MEDIA: SocialMedia[] = [
+  {
+    position: [25, 1, -5],
+    type: 'linkedin',
+    url: 'https://www.linkedin.com/in/fabshof',
+    titleKey: 'social.linkedin.title',
+    color: '#0077B5'
+  },
+  {
+    position: [25, 1, 5],
+    type: 'github',
+    url: 'https://github.com/FabsHof',
+    titleKey: 'social.github.title',
+    color: '#333333'
+  }
+];
+
+const CONTACT_POSITION: [number, number, number] = [0, 1, 20];
+const COLLISION_DISTANCE_SQUARED = 9; // 3 * 3 - avoid sqrt by comparing squared distances
+
+// Group center positions
+const CONTACT_GROUP_CENTER: [number, number, number] = [0, 1, 25];
+const EMPLOYERS_GROUP_CENTER: [number, number, number] = [0, 1, -15];
+const SOCIAL_GROUP_CENTER: [number, number, number] = [30, 1, 0];
+
 function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCollision }: SceneContentProps) {
   const { position, rotation } = useShuttleControls();
   const { t } = useTranslation();
+  const lastCheckRef = useRef(0);
 
   // Convert rotation number to rotation tuple for Three.js
-  const rotationTuple: [number, number, number] = [0, rotation, 0];
+  const rotationTuple: [number, number, number] = useMemo(() => [0, rotation, 0], [rotation]);
 
-  // Group center positions
-  const contactGroupCenter: [number, number, number] = [0, 1, 25];
-  const employersGroupCenter: [number, number, number] = [0, 1, -15];
-  const socialGroupCenter: [number, number, number] = [30, 1, 0];
-
-  // Contact object position (near contact group)
-  const contactPosition: [number, number, number] = [0, 1, 20];
-
-  // Employers group - arranged in a cluster around the group center
-  const projects: Project[] = [
-    {
-      position: [-8, 1, -20],
-      titleKey: 'projects.bioexotec.title',
-      color: '#9b59b6',
-      descriptionKey: 'projects.bioexotec.description'
-    },
-    {
-      position: [8, 1, -20],
-      titleKey: 'projects.ghz.title',
-      color: '#4a90e2',
-      descriptionKey: 'projects.ghz.description'
-    },
-    {
-      position: [-12, 1, -10],
-      titleKey: 'projects.uniklinik.title',
-      color: '#e74c3c',
-      descriptionKey: 'projects.uniklinik.description'
-    },
-    {
-      position: [12, 1, -10],
-      titleKey: 'projects.uni.title',
-      color: '#2ecc71',
-      descriptionKey: 'projects.uni.description'
-    },
-    {
-      position: [-8, 1, -5],
-      titleKey: 'projects.zeiss.title',
-      color: '#f39c12',
-      descriptionKey: 'projects.zeiss.description'
-    },
-    {
-      position: [8, 1, -5],
-      titleKey: 'projects.liebherr.title',
-      color: '#1abc9c',
-      descriptionKey: 'projects.liebherr.description'
-    },
-  ];
-
-  // Social/Connect group - arranged near the social group center
-  const socialMediaObjects: SocialMedia[] = [
-    {
-      position: [25, 1, -5],
-      type: 'linkedin',
-      url: 'https://www.linkedin.com/in/fabshof',
-      titleKey: 'social.linkedin.title',
-      color: '#0077B5'
-    },
-    {
-      position: [25, 1, 5],
-      type: 'github',
-      url: 'https://github.com/FabsHof',
-      titleKey: 'social.github.title',
-      color: '#333333'
-    }
-  ];
-
-  // Check collision with projects, social media, and contact
+  // Throttled collision detection - only check every 100ms
   useEffect(() => {
-    const collisionDistance = 3;
+    const now = Date.now();
+    if (now - lastCheckRef.current < 100) return;
+    lastCheckRef.current = now;
 
-    // Check project collisions
-    projects.forEach((project) => {
+    // Check project collisions using squared distances (no sqrt needed)
+    for (const project of PROJECTS) {
       const dx = position[0] - project.position[0];
       const dz = position[2] - project.position[2];
-      const distance = Math.sqrt(dx * dx + dz * dz);
+      const distanceSquared = dx * dx + dz * dz;
 
-      if (distance < collisionDistance) {
+      if (distanceSquared < COLLISION_DISTANCE_SQUARED) {
         onProjectCollision(project);
+        return; // Only trigger one collision at a time
       }
-    });
+    }
 
     // Check social media collisions
-    socialMediaObjects.forEach((social) => {
+    for (const social of SOCIAL_MEDIA) {
       const dx = position[0] - social.position[0];
       const dz = position[2] - social.position[2];
-      const distance = Math.sqrt(dx * dx + dz * dz);
+      const distanceSquared = dx * dx + dz * dz;
 
-      if (distance < collisionDistance) {
+      if (distanceSquared < COLLISION_DISTANCE_SQUARED) {
         onSocialMediaCollision(social);
+        return;
       }
-    });
+    }
 
     // Check contact collision
-    const contactDx = position[0] - contactPosition[0];
-    const contactDz = position[2] - contactPosition[2];
-    const contactDistance = Math.sqrt(contactDx * contactDx + contactDz * contactDz);
+    const contactDx = position[0] - CONTACT_POSITION[0];
+    const contactDz = position[2] - CONTACT_POSITION[2];
+    const contactDistanceSquared = contactDx * contactDx + contactDz * contactDz;
 
-    if (contactDistance < collisionDistance) {
+    if (contactDistanceSquared < COLLISION_DISTANCE_SQUARED) {
       onContactCollision();
     }
-  }, [position]);
+  }, [position, onProjectCollision, onSocialMediaCollision, onContactCollision]);
 
   return (
     <>
@@ -149,12 +153,12 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
       <SpaceShuttle position={position} rotation={rotationTuple} />
 
       {/* Nebula group labels */}
-      <NebulaLabel position={employersGroupCenter} label={t('groups.employers')} color="#667eea" />
-      <NebulaLabel position={contactGroupCenter} label={t('groups.contact')} color="#e91e63" />
-      <NebulaLabel position={socialGroupCenter} label={t('groups.connect')} color="#0077B5" />
+      <NebulaLabel position={EMPLOYERS_GROUP_CENTER} label={t('groups.employers')} color="#667eea" />
+      <NebulaLabel position={CONTACT_GROUP_CENTER} label={t('groups.contact')} color="#e91e63" />
+      <NebulaLabel position={SOCIAL_GROUP_CENTER} label={t('groups.connect')} color="#0077B5" />
 
       {/* Employers group */}
-      {projects.map((project, index) => (
+      {PROJECTS.map((project, index) => (
         <ProjectObject
           key={index}
           position={project.position}
@@ -165,7 +169,7 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
       ))}
 
       {/* Social/Connect group */}
-      {socialMediaObjects.map((social, index) => (
+      {SOCIAL_MEDIA.map((social, index) => (
         <SocialMediaObject
           key={`social-${index}`}
           position={social.position}
@@ -177,7 +181,7 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
 
       {/* Contact object */}
       <ProjectObject
-        position={contactPosition}
+        position={CONTACT_POSITION}
         title={t('contact.title')}
         color="#e91e63"
         shuttlePosition={position}

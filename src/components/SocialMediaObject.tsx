@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Group } from 'three';
+import { useRef, useState, useMemo } from 'react';
+import { Group, CylinderGeometry, TorusGeometry, CircleGeometry, MeshStandardMaterial } from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 
@@ -10,33 +10,86 @@ interface SocialMediaObjectProps {
   shuttlePosition: [number, number, number];
 }
 
+// Shared geometries - created once and reused across all instances
+const sharedBadgeGeometry = new CylinderGeometry(0.8, 0.8, 0.15, 16); // Reduced from 32 segments
+const sharedRimGeometry = new TorusGeometry(0.8, 0.05, 8, 16); // Reduced segments
+const sharedPedestalGeometry = new CylinderGeometry(0.6, 0.8, 0.2, 8);
+const sharedHeadGeometry = new CircleGeometry(0.35, 16); // Reduced from 32
+const sharedEarGeometry = new CircleGeometry(0.12, 3);
+const sharedBodyGeometry = new CircleGeometry(0.25, 16); // Reduced from 32
+
+// Shared materials that don't change
+const whiteMaterial = new MeshStandardMaterial({ color: '#ffffff' });
+const rimMaterial = new MeshStandardMaterial({
+  color: '#ffffff',
+  metalness: 0.8,
+  roughness: 0.2,
+  emissive: '#ffffff',
+  emissiveIntensity: 0.1
+});
+const pedestalMaterial = new MeshStandardMaterial({
+  color: '#1a1a2e',
+  metalness: 0.9,
+  roughness: 0.1,
+  transparent: true,
+  opacity: 0.6
+});
+
 export function SocialMediaObject({ position, type, shuttlePosition }: SocialMediaObjectProps) {
   const groupRef = useRef<Group>(null);
   const labelGroupRef = useRef<Group>(null);
   const hintGroupRef = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
-  const [rotation, setRotation] = useState(0);
-  const [proximityGlow, setProximityGlow] = useState(0);
   const { camera } = useThree();
+
+  // Store mutable values in refs to avoid state updates in useFrame
+  const rotationRef = useRef(0);
+  const proximityGlowRef = useRef(0);
+
+  const isLinkedIn = type === 'linkedin';
+  const color = isLinkedIn ? '#0077B5' : '#24292e';
+  const label = isLinkedIn ? 'LinkedIn' : 'GitHub';
+
+  // Memoize badge material (color-dependent)
+  const badgeMaterial = useMemo(() => new MeshStandardMaterial({
+    color: color,
+    metalness: 0.4,
+    roughness: 0.6,
+    emissive: color,
+    emissiveIntensity: 0.05
+  }), [color]);
 
   useFrame((state, delta) => {
     if (groupRef.current) {
-      setRotation((prev) => prev + delta * 0.5);
-      groupRef.current.rotation.y = rotation;
+      // Update rotation directly on ref, no state update
+      rotationRef.current += delta * 0.5;
+      groupRef.current.rotation.y = rotationRef.current;
 
       // Floating animation
       groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+
+      // Calculate distance to shuttle for proximity-based glow
+      const dx = shuttlePosition[0] - position[0];
+      const dz = shuttlePosition[2] - position[2];
+      const distance = Math.sqrt(dx * dx + dz * dz);
+
+      // Glow intensity increases as shuttle gets closer (max distance 15 units)
+      const glowStrength = Math.max(0, 1 - distance / 15);
+      proximityGlowRef.current = glowStrength;
+
+      // Update material emissive intensity directly
+      const baseEmissive = 0.05;
+      const hoverEmissive = hovered ? 0.15 : 0;
+      const proximityEmissive = glowStrength * 0.6;
+      badgeMaterial.emissiveIntensity = baseEmissive + hoverEmissive + proximityEmissive;
+
+      // Calculate and apply scale
+      const baseScale = 0.5;
+      const proximityScale = glowStrength * 0.8;
+      const hoverScale = hovered ? 0.2 : 0;
+      const totalScale = baseScale + proximityScale + hoverScale;
+      groupRef.current.scale.setScalar(totalScale);
     }
-
-    // Calculate distance to shuttle for proximity-based glow
-    const dx = shuttlePosition[0] - position[0];
-    const dz = shuttlePosition[2] - position[2];
-    const distance = Math.sqrt(dx * dx + dz * dz);
-
-    // Glow intensity increases as shuttle gets closer (max distance 15 units)
-    const maxGlowDistance = 15;
-    const glowStrength = Math.max(0, 1 - distance / maxGlowDistance);
-    setProximityGlow(glowStrength);
 
     // Make text labels face the camera (billboard effect)
     if (labelGroupRef.current) {
@@ -47,26 +100,11 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
     }
   });
 
-  const isLinkedIn = type === 'linkedin';
-  const color = isLinkedIn ? '#0077B5' : '#24292e';
-  const label = isLinkedIn ? 'LinkedIn' : 'GitHub';
-
-  // Calculate combined glow intensity
-  const baseEmissive = 0.05;
-  const hoverEmissive = 0.15;
-  const proximityEmissive = proximityGlow * 0.6;
-  const totalEmissive = baseEmissive + (hovered ? hoverEmissive : 0) + proximityEmissive;
-
+  // Calculate light intensity
   const baseLightIntensity = 0.3;
-  const hoverLightIntensity = 1.0;
-  const proximityLightIntensity = proximityGlow * 5;
-  const totalLightIntensity = baseLightIntensity + (hovered ? hoverLightIntensity : 0) + proximityLightIntensity;
-
-  // Calculate proximity-based scale
-  const baseScale = 0.5;
-  const proximityScale = proximityGlow * 0.8;
-  const hoverScale = hovered ? 0.2 : 0;
-  const totalScale = baseScale + proximityScale + hoverScale;
+  const hoverLightIntensity = hovered ? 1.0 : 0;
+  const proximityLightIntensity = proximityGlowRef.current * 5;
+  const totalLightIntensity = baseLightIntensity + hoverLightIntensity + proximityLightIntensity;
 
   return (
     <group position={position}>
@@ -74,31 +112,22 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
         ref={groupRef}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
-        scale={totalScale}
       >
-        {/* Circular badge background - rotated 90° so it faces outward */}
-        <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.8, 0.8, 0.15, 32]} />
-          <meshStandardMaterial
-            color={color}
-            metalness={0.4}
-            roughness={0.6}
-            emissive={color}
-            emissiveIntensity={totalEmissive}
-          />
-        </mesh>
+        {/* Circular badge background - rotated 90 so it faces outward */}
+        <mesh
+          castShadow
+          rotation={[Math.PI / 2, 0, 0]}
+          geometry={sharedBadgeGeometry}
+          material={badgeMaterial}
+        />
 
         {/* Badge rim */}
-        <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.8, 0.05, 16, 32]} />
-          <meshStandardMaterial
-            color="#ffffff"
-            metalness={0.8}
-            roughness={0.2}
-            emissive="#ffffff"
-            emissiveIntensity={0.1}
-          />
-        </mesh>
+        <mesh
+          position={[0, 0, 0]}
+          rotation={[Math.PI / 2, 0, 0]}
+          geometry={sharedRimGeometry}
+          material={rimMaterial}
+        />
 
         {isLinkedIn ? (
           // LinkedIn "in" text - on front face of badge
@@ -117,25 +146,25 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
           // GitHub octocat - simplified, on front face of badge
           <group position={[0, 0, 0.08]} rotation={[0, 0, 0]}>
             {/* Head circle */}
-            <mesh>
-              <circleGeometry args={[0.35, 32]} />
-              <meshStandardMaterial color="#ffffff" />
-            </mesh>
+            <mesh geometry={sharedHeadGeometry} material={whiteMaterial} />
             {/* Left ear */}
-            <mesh position={[-0.25, 0.32, 0.01]}>
-              <circleGeometry args={[0.12, 3]} />
-              <meshStandardMaterial color="#ffffff" />
-            </mesh>
+            <mesh
+              position={[-0.25, 0.32, 0.01]}
+              geometry={sharedEarGeometry}
+              material={whiteMaterial}
+            />
             {/* Right ear */}
-            <mesh position={[0.25, 0.32, 0.01]}>
-              <circleGeometry args={[0.12, 3]} />
-              <meshStandardMaterial color="#ffffff" />
-            </mesh>
+            <mesh
+              position={[0.25, 0.32, 0.01]}
+              geometry={sharedEarGeometry}
+              material={whiteMaterial}
+            />
             {/* Body */}
-            <mesh position={[0, -0.35, 0]}>
-              <circleGeometry args={[0.25, 32]} />
-              <meshStandardMaterial color="#ffffff" />
-            </mesh>
+            <mesh
+              position={[0, -0.35, 0]}
+              geometry={sharedBodyGeometry}
+              material={whiteMaterial}
+            />
           </group>
         )}
       </group>
@@ -158,16 +187,12 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
       </group>
 
       {/* Base pedestal */}
-      <mesh position={[0, -0.5, 0]} receiveShadow>
-        <cylinderGeometry args={[0.6, 0.8, 0.2, 8]} />
-        <meshStandardMaterial
-          color="#1a1a2e"
-          metalness={0.9}
-          roughness={0.1}
-          transparent
-          opacity={0.6}
-        />
-      </mesh>
+      <mesh
+        position={[0, -0.5, 0]}
+        receiveShadow
+        geometry={sharedPedestalGeometry}
+        material={pedestalMaterial}
+      />
 
       {/* Clickable hint when hovered */}
       {hovered && (

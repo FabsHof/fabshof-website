@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { Group } from 'three';
+import { useRef, useMemo } from 'react';
+import { Group, SphereGeometry, MeshBasicMaterial } from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 
@@ -9,9 +9,21 @@ interface NebulaLabelProps {
   color?: string;
 }
 
+// Shared geometries - created once and reused across all instances
+const sharedOuterSphereGeometry = new SphereGeometry(3, 12, 12); // Reduced from 32 segments
+const sharedMiddleSphereGeometry = new SphereGeometry(2.5, 12, 12);
+const sharedInnerSphereGeometry = new SphereGeometry(2, 12, 12);
+
 export function NebulaLabel({ position, label, color = '#667eea' }: NebulaLabelProps) {
   const groupRef = useRef<Group>(null);
   const { camera } = useThree();
+
+  // Memoize materials since they depend on color prop
+  const materials = useMemo(() => ({
+    outer: new MeshBasicMaterial({ color, transparent: true, opacity: 0.08 }),
+    middle: new MeshBasicMaterial({ color, transparent: true, opacity: 0.1 }),
+    inner: new MeshBasicMaterial({ color, transparent: true, opacity: 0.12 })
+  }), [color]);
 
   // Billboard effect - always face camera
   useFrame(() => {
@@ -23,30 +35,9 @@ export function NebulaLabel({ position, label, color = '#667eea' }: NebulaLabelP
   return (
     <group position={position}>
       {/* Nebula glow effect - multiple overlapping transparent spheres */}
-      <mesh>
-        <sphereGeometry args={[3, 32, 32]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.08}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[2.5, 32, 32]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.1}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[2, 32, 32]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.12}
-        />
-      </mesh>
+      <mesh geometry={sharedOuterSphereGeometry} material={materials.outer} />
+      <mesh geometry={sharedMiddleSphereGeometry} material={materials.middle} />
+      <mesh geometry={sharedInnerSphereGeometry} material={materials.inner} />
 
       {/* Point light for glow */}
       <pointLight color={color} intensity={2} distance={15} />
@@ -60,7 +51,6 @@ export function NebulaLabel({ position, label, color = '#667eea' }: NebulaLabelP
           anchorY="middle"
           outlineWidth={0.03}
           outlineColor="#000000"
-          font={undefined}
         >
           {label}
         </Text>
