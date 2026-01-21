@@ -9,6 +9,7 @@ import { ProjectPopup } from './ProjectPopup';
 import { ContactPopup } from './ContactPopup';
 import { PrivacyNotice } from './PrivacyNotice';
 import { FollowCamera } from './FollowCamera';
+import { NebulaLabel } from './NebulaLabel';
 import { useShuttleControls } from '../hooks/useShuttleControls';
 
 interface Project {
@@ -39,60 +40,65 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
   // Convert rotation number to rotation tuple for Three.js
   const rotationTuple: [number, number, number] = [0, rotation, 0];
 
-  // Contact object position
+  // Group center positions
+  const contactGroupCenter: [number, number, number] = [0, 1, 25];
+  const employersGroupCenter: [number, number, number] = [0, 1, -15];
+  const socialGroupCenter: [number, number, number] = [30, 1, 0];
+
+  // Contact object position (near contact group)
   const contactPosition: [number, number, number] = [0, 1, 20];
 
-  // Real project positions based on work history - using translation keys
+  // Employers group - arranged in a cluster around the group center
   const projects: Project[] = [
     {
-      position: [0, 1, -20],
+      position: [-8, 1, -20],
       titleKey: 'projects.bioexotec.title',
       color: '#9b59b6',
       descriptionKey: 'projects.bioexotec.description'
     },
     {
-      position: [10, 1, 10],
+      position: [8, 1, -20],
       titleKey: 'projects.ghz.title',
       color: '#4a90e2',
       descriptionKey: 'projects.ghz.description'
     },
     {
-      position: [-10, 1, 10],
+      position: [-12, 1, -10],
       titleKey: 'projects.uniklinik.title',
       color: '#e74c3c',
       descriptionKey: 'projects.uniklinik.description'
     },
     {
-      position: [15, 1, -5],
+      position: [12, 1, -10],
       titleKey: 'projects.uni.title',
       color: '#2ecc71',
       descriptionKey: 'projects.uni.description'
     },
     {
-      position: [-15, 1, -5],
+      position: [-8, 1, -5],
       titleKey: 'projects.zeiss.title',
       color: '#f39c12',
       descriptionKey: 'projects.zeiss.description'
     },
     {
-      position: [20, 1, 5],
+      position: [8, 1, -5],
       titleKey: 'projects.liebherr.title',
       color: '#1abc9c',
       descriptionKey: 'projects.liebherr.description'
     },
   ];
 
-  // Social media objects - using translation keys
+  // Social/Connect group - arranged near the social group center
   const socialMediaObjects: SocialMedia[] = [
     {
-      position: [-25, 1, 15],
+      position: [25, 1, -5],
       type: 'linkedin',
       url: 'https://www.linkedin.com/in/fabshof',
       titleKey: 'social.linkedin.title',
       color: '#0077B5'
     },
     {
-      position: [25, 1, 15],
+      position: [25, 1, 5],
       type: 'github',
       url: 'https://github.com/FabsHof',
       titleKey: 'social.github.title',
@@ -142,6 +148,12 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
       <SpaceEnvironment />
       <SpaceShuttle position={position} rotation={rotationTuple} />
 
+      {/* Nebula group labels */}
+      <NebulaLabel position={employersGroupCenter} label={t('groups.employers')} color="#667eea" />
+      <NebulaLabel position={contactGroupCenter} label={t('groups.contact')} color="#e91e63" />
+      <NebulaLabel position={socialGroupCenter} label={t('groups.connect')} color="#0077B5" />
+
+      {/* Employers group */}
       {projects.map((project, index) => (
         <ProjectObject
           key={index}
@@ -152,7 +164,7 @@ function SceneContent({ onProjectCollision, onSocialMediaCollision, onContactCol
         />
       ))}
 
-      {/* Social media objects */}
+      {/* Social/Connect group */}
       {socialMediaObjects.map((social, index) => (
         <SocialMediaObject
           key={`social-${index}`}
@@ -269,6 +281,7 @@ export function Scene() {
           description={t(`social.${selectedSocial.type}.description`)}
           color={selectedSocial.color}
           url={selectedSocial.url}
+          iconType={selectedSocial.type}
           onClose={() => handleClosePopup(selectedSocial.titleKey)}
         />
       )}

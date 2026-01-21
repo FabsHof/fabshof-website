@@ -3,7 +3,14 @@
     "controls": "Steuerung",
     "arrowKeys": "Pfeiltasten",
     "tiltDevice": "Gerät neigen",
-    "explorePortfolio": "Navigiere durch den Weltraum, um mein Portfolio zu erkunden"
+    "explorePortfolio": "Navigiere durch den Weltraum, um mein Portfolio zu erkunden",
+    "clickToDismiss": "Klicken zum Schließen"
+  },
+  "groups": {
+    "employers": "Erfahrung",
+    "contact": "Kontakt",
+    "connect": "Vernetzen",
+    "projects": "Projekte"
   },
   "footer": {
     "madeWith": "Erstellt mit",

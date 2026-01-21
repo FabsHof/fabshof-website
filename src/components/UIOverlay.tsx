@@ -76,7 +76,7 @@ export function UIOverlay() {
                 <strong>← →</strong> - Left/Right
               </p>
             )}
-            <small>Click to dismiss</small>
+            <small>{t('navigation.clickToDismiss')}</small>
           </div>
         </div>
       )}

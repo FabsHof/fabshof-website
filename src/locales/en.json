@@ -3,7 +3,14 @@
     "controls": "Controls",
     "arrowKeys": "Arrow Keys",
     "tiltDevice": "Tilt Device",
-    "explorePortfolio": "Navigate through space to explore my portfolio"
+    "explorePortfolio": "Navigate through space to explore my portfolio",
+    "clickToDismiss": "Click to dismiss"
+  },
+  "groups": {
+    "employers": "Experience",
+    "contact": "Contact",
+    "connect": "Connect",
+    "projects": "Projects"
   },
   "footer": {
     "madeWith": "Made with",

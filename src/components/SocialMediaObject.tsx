@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Mesh, Group } from 'three';
+import { Group } from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 
@@ -10,7 +10,7 @@ interface SocialMediaObjectProps {
   shuttlePosition: [number, number, number];
 }
 
-export function SocialMediaObject({ position, type, url, shuttlePosition }: SocialMediaObjectProps) {
+export function SocialMediaObject({ position, type, shuttlePosition }: SocialMediaObjectProps) {
   const groupRef = useRef<Group>(null);
   const labelGroupRef = useRef<Group>(null);
   const hintGroupRef = useRef<Group>(null);
@@ -47,15 +47,11 @@ export function SocialMediaObject({ position, type, url, shuttlePosition }: Soci
     }
   });
 
-  const handleClick = () => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
   const isLinkedIn = type === 'linkedin';
-  const color = isLinkedIn ? '#0077B5' : '#333333';
+  const color = isLinkedIn ? '#0077B5' : '#24292e';
   const label = isLinkedIn ? 'LinkedIn' : 'GitHub';
 
-  // Calculate combined glow intensity (very minimal by default)
+  // Calculate combined glow intensity
   const baseEmissive = 0.05;
   const hoverEmissive = 0.15;
   const proximityEmissive = proximityGlow * 0.6;
@@ -66,7 +62,7 @@ export function SocialMediaObject({ position, type, url, shuttlePosition }: Soci
   const proximityLightIntensity = proximityGlow * 5;
   const totalLightIntensity = baseLightIntensity + (hovered ? hoverLightIntensity : 0) + proximityLightIntensity;
 
-  // Calculate proximity-based scale (smaller by default, grows when approaching)
+  // Calculate proximity-based scale
   const baseScale = 0.5;
   const proximityScale = proximityGlow * 0.8;
   const hoverScale = hovered ? 0.2 : 0;
@@ -76,105 +72,78 @@ export function SocialMediaObject({ position, type, url, shuttlePosition }: Soci
     <group position={position}>
       <group
         ref={groupRef}
-        onClick={handleClick}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         scale={totalScale}
       >
+        {/* Circular badge background - rotated 90° so it faces outward */}
+        <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.8, 0.8, 0.15, 32]} />
+          <meshStandardMaterial
+            color={color}
+            metalness={0.4}
+            roughness={0.6}
+            emissive={color}
+            emissiveIntensity={totalEmissive}
+          />
+        </mesh>
+
+        {/* Badge rim */}
+        <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.8, 0.05, 16, 32]} />
+          <meshStandardMaterial
+            color="#ffffff"
+            metalness={0.8}
+            roughness={0.2}
+            emissive="#ffffff"
+            emissiveIntensity={0.1}
+          />
+        </mesh>
+
         {isLinkedIn ? (
-          // LinkedIn logo - rounded square with "in" text
-          <>
-            {/* Background rounded square */}
-            <mesh castShadow>
-              <boxGeometry args={[1.4, 1.4, 0.15]} />
-              <meshStandardMaterial
-                color={color}
-                metalness={0.3}
-                roughness={0.7}
-                emissive={color}
-                emissiveIntensity={totalEmissive}
-              />
-            </mesh>
-
-            {/* "in" text - styled like LinkedIn */}
-            <Text
-              position={[0, 0, 0.12]}
-              fontSize={0.7}
-              color="white"
-              anchorX="center"
-              anchorY="middle"
-              letterSpacing={-0.05}
-            >
-              in
-            </Text>
-          </>
+          // LinkedIn "in" text - on front face of badge
+          <Text
+            position={[0, 0, 0.08]}
+            rotation={[0, 0, 0]}
+            fontSize={0.55}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+          >
+            in
+          </Text>
         ) : (
-          // GitHub logo - flat rectangular dark icon
-          <>
-            {/* Background rounded square - dark theme */}
-            <mesh castShadow>
-              <boxGeometry args={[1.4, 1.4, 0.15]} />
-              <meshStandardMaterial
-                color="#24292e"
-                metalness={0.3}
-                roughness={0.7}
-                emissive="#24292e"
-                emissiveIntensity={totalEmissive}
-              />
+          // GitHub octocat - simplified, on front face of badge
+          <group position={[0, 0, 0.08]} rotation={[0, 0, 0]}>
+            {/* Head circle */}
+            <mesh>
+              <circleGeometry args={[0.35, 32]} />
+              <meshStandardMaterial color="#ffffff" />
             </mesh>
-
-            {/* GitHub cat logo - simplified white mark */}
-            <group position={[0, 0, 0.12]}>
-              {/* Main circle for head */}
-              <mesh position={[0, 0.15, 0]}>
-                <sphereGeometry args={[0.32, 32, 32]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-
-              {/* Cat ears */}
-              <mesh position={[-0.2, 0.42, 0]}>
-                <sphereGeometry args={[0.08, 16, 16]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-              <mesh position={[0.2, 0.42, 0]}>
-                <sphereGeometry args={[0.08, 16, 16]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-
-              {/* Body - rounded rectangle */}
-              <mesh position={[0, -0.2, 0]}>
-                <boxGeometry args={[0.5, 0.3, 0.05]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-
-              {/* Arms */}
-              <mesh position={[-0.3, -0.15, 0]} rotation={[0, 0, 0.5]}>
-                <boxGeometry args={[0.12, 0.08, 0.05]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-              <mesh position={[0.3, -0.15, 0]} rotation={[0, 0, -0.5]}>
-                <boxGeometry args={[0.12, 0.08, 0.05]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-
-              {/* Legs */}
-              <mesh position={[-0.12, -0.42, 0]}>
-                <boxGeometry args={[0.1, 0.12, 0.05]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-              <mesh position={[0.12, -0.42, 0]}>
-                <boxGeometry args={[0.1, 0.12, 0.05]} />
-                <meshStandardMaterial color="#FFFFFF" />
-              </mesh>
-            </group>
-          </>
+            {/* Left ear */}
+            <mesh position={[-0.25, 0.32, 0.01]}>
+              <circleGeometry args={[0.12, 3]} />
+              <meshStandardMaterial color="#ffffff" />
+            </mesh>
+            {/* Right ear */}
+            <mesh position={[0.25, 0.32, 0.01]}>
+              <circleGeometry args={[0.12, 3]} />
+              <meshStandardMaterial color="#ffffff" />
+            </mesh>
+            {/* Body */}
+            <mesh position={[0, -0.35, 0]}>
+              <circleGeometry args={[0.25, 32]} />
+              <meshStandardMaterial color="#ffffff" />
+            </mesh>
+          </group>
         )}
       </group>
 
-      {/* Glow effect with proximity-based intensity */}
+      {/* Glow effect */}
       <pointLight color={color} intensity={totalLightIntensity} distance={8} />
 
-      {/* Floating text label - always faces camera */}
+      {/* Floating text label */}
       <group ref={labelGroupRef} position={[0, 2.5, 0]}>
         <Text
           fontSize={0.3}
@@ -200,7 +169,7 @@ export function SocialMediaObject({ position, type, url, shuttlePosition }: Soci
         />
       </mesh>
 
-      {/* Clickable hint when hovered - always faces camera */}
+      {/* Clickable hint when hovered */}
       {hovered && (
         <group ref={hintGroupRef} position={[0, -1.2, 0]}>
           <Text

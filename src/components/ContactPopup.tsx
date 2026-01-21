@@ -10,7 +10,6 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -24,7 +23,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
     const email = `${parts[0]}@${parts[1]}.${parts[2]}`;
 
     const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(`Contact from ${formData.name}`)}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      `Name: ${formData.name}\n\nMessage:\n${formData.message}`
     )}`;
 
     try {
@@ -51,6 +50,7 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
   return (
     <div className="project-popup-overlay" onClick={onClose}>
       <div className="project-popup" onClick={(e) => e.stopPropagation()}>
+        <button className="popup-close" onClick={onClose}>×</button>
         <h2 style={{ color: '#4a90e2' }}>📧 {t('contact.title')}</h2>
 
         {status === 'success' ? (
@@ -66,19 +66,6 @@ export function ContactPopup({ onClose }: ContactPopupProps) {
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
-                required
-                disabled={status === 'sending'}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">{t('contact.email')}</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
                 onChange={handleChange}
                 required
                 disabled={status === 'sending'}

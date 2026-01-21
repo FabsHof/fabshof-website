@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaLinkedinIn, FaGithub } from 'react-icons/fa';
 import './ProjectPopup.css';
 
 interface ProjectPopupProps {
@@ -8,9 +9,10 @@ interface ProjectPopupProps {
   color: string;
   onClose: () => void;
   url?: string;
+  iconType?: 'linkedin' | 'github';
 }
 
-export function ProjectPopup({ title, description, color, onClose, url }: ProjectPopupProps) {
+export function ProjectPopup({ title, description, color, onClose, url, iconType }: ProjectPopupProps) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -23,6 +25,22 @@ export function ProjectPopup({ title, description, color, onClose, url }: Projec
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
+
+  // Extract emoji from title (if present at the start)
+  const extractEmoji = (text: string): { emoji: string | null; cleanTitle: string } => {
+    // Match emoji at the start of the string (including multi-codepoint emojis)
+    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u;
+    const match = text.match(emojiRegex);
+    if (match) {
+      return {
+        emoji: match[0],
+        cleanTitle: text.slice(match[0].length).trim()
+      };
+    }
+    return { emoji: null, cleanTitle: text };
+  };
+
+  const { emoji, cleanTitle } = extractEmoji(title);
 
   // Extract tech tags from description
   const extractTechTags = (desc?: string): string[] => {
@@ -50,8 +68,12 @@ export function ProjectPopup({ title, description, color, onClose, url }: Projec
               backgroundColor: color,
               boxShadow: `0 0 20px ${color}`
             }}
-          />
-          <h2>{title}</h2>
+          >
+            {iconType === 'linkedin' && <FaLinkedinIn className="popup-react-icon" />}
+            {iconType === 'github' && <FaGithub className="popup-react-icon" />}
+            {!iconType && emoji && <span className="popup-emoji">{emoji}</span>}
+          </div>
+          <h2>{cleanTitle}</h2>
         </div>
         <div className="popup-content">
           <p>{description || 'Project details coming soon...'}</p>
