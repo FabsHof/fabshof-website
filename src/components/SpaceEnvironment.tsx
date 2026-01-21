@@ -7,7 +7,7 @@ const sunMaterial = new THREE.MeshStandardMaterial({
   emissive: '#FDB813',
   emissiveIntensity: 2.0,
   metalness: 0.2,
-  roughness: 0.6
+  roughness: 0.6,
 });
 
 const floorGeometry = new THREE.PlaneGeometry(100, 100);
@@ -20,13 +20,13 @@ const floorMaterial = new THREE.MeshPhysicalMaterial({
   opacity: 0.9,
   clearcoat: 1,
   clearcoatRoughness: 0.05,
-  envMapIntensity: 1.5
+  envMapIntensity: 1.5,
 });
 
 const starsMaterial = new THREE.PointsMaterial({
   color: '#ffffff',
   size: 0.15,
-  sizeAttenuation: false
+  sizeAttenuation: false,
 });
 
 // Pre-generate star positions once at module load to avoid calling Math.random during render
@@ -55,12 +55,7 @@ export function SpaceEnvironment() {
       <points geometry={starsGeometry} material={starsMaterial} />
 
       {/* Sun - planet-like sphere at horizon */}
-      <mesh
-        position={[0, 15, -80]}
-        castShadow
-        geometry={sunGeometry}
-        material={sunMaterial}
-      />
+      <mesh position={[0, 15, -80]} castShadow geometry={sunGeometry} material={sunMaterial} />
 
       {/* Minimal ambient light */}
       <ambientLight intensity={0.15} />

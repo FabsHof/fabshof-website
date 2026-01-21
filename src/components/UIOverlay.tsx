@@ -6,7 +6,9 @@ import './UIOverlay.css';
 
 export function UIOverlay() {
   const { t } = useTranslation();
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
   const [showInstructions, setShowInstructions] = useState(true);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [showImpressum, setShowImpressum] = useState(false);
@@ -80,31 +82,21 @@ export function UIOverlay() {
       <footer className="footer">
         <p>{t('navigation.explorePortfolio')}</p>
         <div className="footer-links">
-          <button
-            className="footer-link"
-            onClick={() => setShowPrivacyPolicy(true)}
-          >
+          <button className="footer-link" onClick={() => setShowPrivacyPolicy(true)}>
             Datenschutz
           </button>
           <span className="footer-separator">|</span>
-          <button
-            className="footer-link"
-            onClick={() => setShowImpressum(true)}
-          >
+          <button className="footer-link" onClick={() => setShowImpressum(true)}>
             Impressum
           </button>
         </div>
       </footer>
 
       {/* Privacy Policy */}
-      {showPrivacyPolicy && (
-        <PrivacyPolicy onClose={() => setShowPrivacyPolicy(false)} />
-      )}
+      {showPrivacyPolicy && <PrivacyPolicy onClose={() => setShowPrivacyPolicy(false)} />}
 
       {/* Impressum */}
-      {showImpressum && (
-        <Impressum onClose={() => setShowImpressum(false)} />
-      )}
+      {showImpressum && <Impressum onClose={() => setShowImpressum(false)} />}
 
       {/* Toggle instructions button */}
       {!showInstructions && (

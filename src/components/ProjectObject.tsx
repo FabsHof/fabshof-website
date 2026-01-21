@@ -14,7 +14,12 @@ interface ProjectObjectProps {
 const sharedSphereGeometry = new SphereGeometry(1, 16, 16); // Reduced from 32 segments
 const sharedPedestalGeometry = new CylinderGeometry(0.6, 0.8, 0.2, 8);
 
-export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosition }: ProjectObjectProps) {
+export function ProjectObject({
+  position,
+  title,
+  color = '#4a90e2',
+  shuttlePosition,
+}: ProjectObjectProps) {
   const meshRef = useRef<Mesh>(null);
   const textGroupRef = useRef<Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -26,21 +31,29 @@ export function ProjectObject({ position, title, color = '#4a90e2', shuttlePosit
   const [lightIntensity, setLightIntensity] = useState(0.3);
 
   // Memoize materials
-  const sphereMaterial = useMemo(() => new MeshStandardMaterial({
-    color: color,
-    metalness: 0.3,
-    roughness: 0.7,
-    emissive: color,
-    emissiveIntensity: 0.05
-  }), [color]);
+  const sphereMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        color: color,
+        metalness: 0.3,
+        roughness: 0.7,
+        emissive: color,
+        emissiveIntensity: 0.05,
+      }),
+    [color]
+  );
 
-  const pedestalMaterial = useMemo(() => new MeshStandardMaterial({
-    color: '#1a1a2e',
-    metalness: 0.9,
-    roughness: 0.1,
-    transparent: true,
-    opacity: 0.6
-  }), []);
+  const pedestalMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        color: '#1a1a2e',
+        metalness: 0.9,
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.6,
+      }),
+    []
+  );
 
   useFrame((state, delta) => {
     if (meshRef.current) {

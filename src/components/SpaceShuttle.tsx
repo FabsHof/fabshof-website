@@ -36,7 +36,11 @@ export function SpaceShuttle({ position, rotation }: SpaceShuttleProps) {
 
   return (
     <group ref={groupRef} position={position} rotation={rotation}>
-      <primitive object={clonedScene} scale={0.003} rotation={[Math.PI / 2, Math.PI, Math.PI / 2]} />
+      <primitive
+        object={clonedScene}
+        scale={0.003}
+        rotation={[Math.PI / 2, Math.PI, Math.PI / 2]}
+      />
       <pointLight position={[0, 2, 0]} intensity={1} color="#ffffff" />
     </group>
   );

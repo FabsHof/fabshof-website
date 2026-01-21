@@ -11,6 +11,7 @@ Personal portfolio website for Fabian Hofmann featuring an interactive 3D space 
 ## Architecture
 
 ### Core Concept
+
 Users navigate a space shuttle through a 3D environment, colliding with floating objects that represent projects, social media links, and a contact form. Each collision triggers a popup with relevant information.
 
 ### Key Components
@@ -26,6 +27,7 @@ Users navigate a space shuttle through a 3D environment, colliding with floating
 - `LanguageSwitcher.tsx` - DE/EN toggle
 
 ### Data Flow
+
 1. `useShuttleControls` tracks shuttle position via arrow keys or device tilt
 2. `SceneContent` checks distances between shuttle and objects each frame
 3. On collision (distance < 3 units), parent `Scene` shows relevant popup
@@ -43,8 +45,7 @@ Translation files in `src/locales/{en,de}.json`. Project/social descriptions use
 
 ## Assets & Credits
 
-<!-- Add asset sources/credits here -->
--
+## <!-- Add asset sources/credits here -->
 
 ## Notes for Future Sessions
 

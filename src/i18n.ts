@@ -11,17 +11,17 @@ i18n
   .init({
     resources: {
       en: { translation: en },
-      de: { translation: de }
+      de: { translation: de },
     },
     fallbackLng: 'en',
     supportedLngs: ['en', 'de'],
     interpolation: {
-      escapeValue: false
+      escapeValue: false,
     },
     detection: {
       order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
-    }
+      caches: ['localStorage'],
+    },
   });
 
 export default i18n;

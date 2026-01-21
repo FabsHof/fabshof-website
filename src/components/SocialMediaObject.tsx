@@ -1,5 +1,12 @@
 import { useRef, useState, useMemo } from 'react';
-import { Group, CylinderGeometry, TorusGeometry, CircleGeometry, MeshStandardMaterial, Mesh } from 'three';
+import {
+  Group,
+  CylinderGeometry,
+  TorusGeometry,
+  CircleGeometry,
+  MeshStandardMaterial,
+  Mesh,
+} from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 
@@ -25,14 +32,14 @@ const rimMaterial = new MeshStandardMaterial({
   metalness: 0.8,
   roughness: 0.2,
   emissive: '#ffffff',
-  emissiveIntensity: 0.1
+  emissiveIntensity: 0.1,
 });
 const pedestalMaterial = new MeshStandardMaterial({
   color: '#1a1a2e',
   metalness: 0.9,
   roughness: 0.1,
   transparent: true,
-  opacity: 0.6
+  opacity: 0.6,
 });
 
 export function SocialMediaObject({ position, type, shuttlePosition }: SocialMediaObjectProps) {
@@ -53,13 +60,17 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
   const label = isLinkedIn ? 'LinkedIn' : 'GitHub';
 
   // Memoize badge material (color-dependent)
-  const badgeMaterial = useMemo(() => new MeshStandardMaterial({
-    color: color,
-    metalness: 0.4,
-    roughness: 0.6,
-    emissive: color,
-    emissiveIntensity: 0.05
-  }), [color]);
+  const badgeMaterial = useMemo(
+    () =>
+      new MeshStandardMaterial({
+        color: color,
+        metalness: 0.4,
+        roughness: 0.6,
+        emissive: color,
+        emissiveIntensity: 0.05,
+      }),
+    [color]
+  );
 
   useFrame((state, delta) => {
     if (groupRef.current) {
@@ -165,11 +176,7 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
               material={whiteMaterial}
             />
             {/* Body */}
-            <mesh
-              position={[0, -0.35, 0]}
-              geometry={sharedBodyGeometry}
-              material={whiteMaterial}
-            />
+            <mesh position={[0, -0.35, 0]} geometry={sharedBodyGeometry} material={whiteMaterial} />
           </group>
         )}
       </group>
@@ -202,12 +209,7 @@ export function SocialMediaObject({ position, type, shuttlePosition }: SocialMed
       {/* Clickable hint when hovered */}
       {hovered && (
         <group ref={hintGroupRef} position={[0, -1.2, 0]}>
-          <Text
-            fontSize={0.2}
-            color="#4a90e2"
-            anchorX="center"
-            anchorY="middle"
-          >
+          <Text fontSize={0.2} color="#4a90e2" anchorX="center" anchorY="middle">
             Click to visit
           </Text>
         </group>
