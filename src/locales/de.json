@@ -2,9 +2,14 @@
   "navigation": {
     "controls": "Steuerung",
     "arrowKeys": "Pfeiltasten",
-    "tiltDevice": "Gerät neigen",
+    "tiltDevice": "Neige dein Gerät zum Navigieren",
+    "tiltInstructions": "Nach vorne/hinten neigen zum Bewegen, nach links/rechts neigen zum Drehen",
     "explorePortfolio": "Navigiere durch den Weltraum, um mein Portfolio zu erkunden",
-    "clickToDismiss": "Klicken zum Schließen"
+    "clickToDismiss": "Klicken zum Schließen",
+    "enableMotion": "Bewegungssteuerung aktivieren",
+    "motionEnabled": "Bewegungssteuerung aktiviert!",
+    "permissionDenied": "Zugriff auf Bewegungssensoren wurde verweigert. Bitte aktiviere ihn in den Geräteeinstellungen.",
+    "recalibrate": "Neu kalibrieren"
   },
   "groups": {
     "employers": "Erfahrung",

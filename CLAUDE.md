@@ -49,4 +49,25 @@ Translation files in `src/locales/{en,de}.json`. Project/social descriptions use
 
 ## Notes for Future Sessions
 
-<!-- Add notes here as the project evolves -->
+### Device Tilt Controls Fix (January 2026)
+
+Fixed device tilt controls for iOS devices. The previous implementation had several issues:
+
+1. **iOS Permission Handling**: iOS 13+ requires `DeviceOrientationEvent.requestPermission()` to be called from a user gesture (button click). The previous code tried to call it automatically on mount, which silently failed.
+
+2. **Architecture Changes**:
+   - Created `src/utils/deviceOrientation.ts` - shared module for orientation handling
+   - Permission button added to `UIOverlay.tsx` for iOS users
+   - `useShuttleControls.ts` now uses the shared module
+
+3. **Null-safe Orientation Data**: Initial orientation values are `null` instead of `0` to prevent the shuttle from drifting before orientation data is received.
+
+4. **Improved Tilt Sensitivity**:
+   - Neutral position: 20° (natural phone holding angle)
+   - Forward/backward range: 50° for responsive control
+   - Left/right range: 45° for comfortable side tilt
+   - Beta angle normalization for extreme angles (>90° or <-90°)
+
+5. **orientationActive Flag**: Shuttle only responds to tilt when valid orientation data has been received.
+
+6. **Non-iOS devices**: Automatically start orientation listening without permission dialog.
